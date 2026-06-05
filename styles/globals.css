@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+/* Tell Tailwind v4 what "dark:" means */
+@variant dark (&:where(.dark, .dark *));
+
+/* ── Design tokens ─────────────────────────────────── */
+:root {
+  --font-heading: 'Nunito', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+
+  --bg-page:   #f0fdf4;
+  --bg-card:   #ffffff;
+  --bg-nav:    #ffffff;
+  --bg-muted:  #f9fafb;
+  --text-base: #0f172a;
+  --text-muted:#6b7280;
+  --border:    #e5e7eb;
+}
+
+html.dark {
+  --bg-page:   #0f172a;
+  --bg-card:   #1e293b;
+  --bg-nav:    #1e293b;
+  --bg-muted:  #0f172a;
+  --text-base: #f1f5f9;
+  --text-muted:#94a3b8;
+  --border:    #334155;
+}
+
+/* ── Base styles ───────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* All buttons & interactive elements show pointer cursor */
+button, [role="button"], summary { cursor: pointer; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-page);
+  color: var(--text-base);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+
+/* Page entrance animation */
+main { animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Dark mode overrides ────────────────────────────
+   These are unlayered CSS rules, so they win over
+   Tailwind's @layer utilities classes automatically.
+   We also use !important as belt-and-suspenders.
+   ─────────────────────────────────────────────────── */
+
+/* Backgrounds */
+html.dark .bg-white         { background-color: #1e293b !important; }
+html.dark .bg-green-50      { background-color: #0f172a !important; }
+html.dark .bg-gray-50       { background-color: #0f172a !important; }
+html.dark .bg-gray-100      { background-color: #334155 !important; }
+html.dark .bg-gray-900      { background-color: #020617 !important; }
+
+/* Coloured icon/badge backgrounds — use translucent tints so icons stay visible on dark cards */
+html.dark .bg-emerald-50    { background-color: rgba(16,  185, 129, 0.15) !important; }
+html.dark .bg-blue-50       { background-color: rgba(59,  130, 246, 0.15) !important; }
+html.dark .bg-red-50        { background-color: rgba(239,  68,  68, 0.22) !important; }
+html.dark .bg-amber-50      { background-color: rgba(245, 158,  11, 0.15) !important; }
+html.dark .bg-purple-50     { background-color: rgba(139,  92, 246, 0.15) !important; }
+html.dark .bg-indigo-50     { background-color: rgba( 99, 102, 241, 0.15) !important; }
+html.dark .bg-orange-50     { background-color: rgba(249, 115,  22, 0.15) !important; }
+html.dark .bg-pink-50       { background-color: rgba(236,  72, 153, 0.15) !important; }
+
+/* Badge/chip -100 level backgrounds — make status badges and type tags readable on dark cards */
+html.dark .bg-blue-100      { background-color: rgba(59,  130, 246, 0.25) !important; }
+html.dark .bg-emerald-100   { background-color: rgba(16,  185, 129, 0.25) !important; }
+html.dark .bg-red-100       { background-color: rgba(239,  68,  68, 0.25) !important; }
+html.dark .bg-orange-100    { background-color: rgba(249, 115,  22, 0.25) !important; }
+html.dark .bg-purple-100    { background-color: rgba(139,  92, 246, 0.25) !important; }
+html.dark .bg-amber-100     { background-color: rgba(245, 158,  11, 0.25) !important; }
+
+/* Navbar — always has background */
+nav {
+  background-color: var(--bg-nav);
+  border-bottom-color: var(--border);
+}
+html.dark nav { border-bottom-color: #334155; }
+
+/* Text — all muted grays must be clearly visible on dark bg */
+html.dark .text-gray-900    { color: #f1f5f9 !important; }
+html.dark .text-gray-800    { color: #e2e8f0 !important; }
+html.dark .text-gray-700    { color: #d1d5db !important; }
+html.dark .text-gray-600    { color: #b0b8c8 !important; }
+html.dark .text-gray-500    { color: #94a3b8 !important; }  /* was #64748b — too dark */
+html.dark .text-gray-400    { color: #64748b !important; }  /* was #475569 — too dark */
+html.dark .text-gray-300    { color: #475569 !important; }
+
+/* Hero heading: on dark-mode the headline should stay visible */
+html.dark .hero-headline     { color: #e2e8f0 !important; }
+
+/* Coloured text — dark variants of medium/dark shades so they're readable on dark backgrounds */
+html.dark .text-blue-700     { color: #93c5fd !important; }
+html.dark .text-blue-800     { color: #bfdbfe !important; }
+html.dark .text-emerald-700  { color: #6ee7b7 !important; }
+html.dark .text-red-700      { color: #fca5a5 !important; }
+html.dark .text-orange-700   { color: #fdba74 !important; }
+html.dark .text-purple-700   { color: #c4b5fd !important; }
+html.dark .text-amber-700    { color: #fcd34d !important; }
+html.dark .border-blue-100   { border-color: rgba(59,130,246,0.3) !important; }
+
+/* Borders — gray-100 was same as card bg (#1e293b), making borders invisible */
+html.dark .border-gray-100  { border-color: #334155 !important; }
+html.dark .border-gray-200  { border-color: #475569 !important; }
+html.dark .border-gray-300  { border-color: #64748b !important; }
+
+/* Dividers — must contrast against card bg (#1e293b) */
+html.dark .divide-gray-50  > * + * { border-color: #334155 !important; }
+html.dark .divide-gray-100 > * + * { border-color: #475569 !important; }
+
+/* Shadows */
+html.dark .shadow-sm  { box-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; }
+html.dark .shadow-md  { box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important; }
+html.dark .shadow-lg  { box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
+
+/* Inputs */
+html.dark input:not([type="file"]),
+html.dark select,
+html.dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: #475569 !important; }
+
+/* Table rows */
+html.dark .hover\:bg-gray-50:hover  { background-color: #243650 !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+/* .bg-gray-50 = page / section backgrounds → very dark */
+html.dark .bg-gray-50               { background-color: #0f172a !important; }
+/* thead header row — use thead tr.bg-gray-50 to beat the .bg-gray-50 override (which has higher specificity) */
+html.dark thead tr.bg-gray-50       { background-color: #1e293b !important; }
+html.dark thead tr                  { background-color: #1e293b !important; }
+
+/* Table row dividers: divide-gray-200 and divide-gray-100 need to be visible */
+html.dark .divide-gray-200 > * + *  { border-color: #334155 !important; }
+
+/* Subtle zebra striping for tbody rows — distinguishes rows on low-contrast dark cards */
+html.dark tbody tr:nth-child(even)  { background-color: rgba(255,255,255,0.04) !important; }
+
+/* Admin sidebar stays dark always — no overrides needed */
+
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar            { width: 5px; height: 5px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: #a7f3d0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover{ background: #059669; }
+html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+/* ── Focus ring ───────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 2px;
+}
