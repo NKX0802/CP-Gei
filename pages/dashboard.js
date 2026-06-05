@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, Calendar } from 'lucide-react'
+import { Plus, Calendar, AlertTriangle, X } from 'lucide-react'
 import BookingCard from '@/components/BookingCard'
 import { BOOKINGS } from '@/lib/fakeData'
+import toast from 'react-hot-toast'
 
 const TABS = [
   { key: 'booked',    label: 'Upcoming',  statuses: ['booked'] },
@@ -13,15 +14,24 @@ const TABS = [
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('booked')
   const [bookings, setBookings] = useState(BOOKINGS)
+  const [cancelConfirmId, setCancelConfirmId] = useState(null)
 
-  function handleCancel(id) {
+  const cancelTarget = bookings.find(b => b.booking_id === cancelConfirmId)
+
+  function requestCancel(id) {
+    setCancelConfirmId(id)
+  }
+
+  function confirmCancel() {
     setBookings(prev =>
       prev.map(b =>
-        b.booking_id === id
+        b.booking_id === cancelConfirmId
           ? { ...b, booking_status: 'cancelled', booking_cancel_reason: 'Cancelled by user' }
           : b
       )
     )
+    toast('Booking cancelled.', { icon: '🚫' })
+    setCancelConfirmId(null)
   }
 
   const upcomingCount = bookings.filter(b => b.booking_status === 'booked').length
@@ -73,7 +83,7 @@ export default function DashboardPage() {
         {filtered.length > 0 ? (
           <div className="space-y-3">
             {filtered.map(booking => (
-              <BookingCard key={booking.booking_id} booking={booking} onCancel={handleCancel} />
+              <BookingCard key={booking.booking_id} booking={booking} onCancel={requestCancel} />
             ))}
           </div>
         ) : (
@@ -96,6 +106,51 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Cancel confirmation modal */}
+      {cancelConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setCancelConfirmId(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle size={20} className="text-red-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-base" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                  Cancel booking?
+                </h3>
+                {cancelTarget && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {cancelTarget.facility_name} · {cancelTarget.booking_time_slot}
+                  </p>
+                )}
+                <p className="text-sm text-gray-400 mt-1">This action cannot be undone.</p>
+              </div>
+              <button
+                onClick={() => setCancelConfirmId(null)}
+                className="ml-auto p-1 rounded-lg hover:bg-gray-100 text-gray-400 shrink-0 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={confirmCancel}
+                className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Yes, cancel it
+              </button>
+              <button
+                onClick={() => setCancelConfirmId(null)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Keep it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

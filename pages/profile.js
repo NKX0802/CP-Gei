@@ -1,16 +1,17 @@
 ﻿import { useState } from 'react'
-import { User, Mail, Lock, Eye, EyeOff, Save, LogOut } from 'lucide-react'
+import { User, Mail, Lock, Eye, EyeOff, Save, LogOut, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useRole } from '@/lib/roleContext'
 import { FAKE_STUDENT } from '@/lib/fakeData'
 
 export default function ProfilePage() {
-  const { switchRole } = useRole()
+  const { logout } = useRole()
   const [name, setName] = useState(FAKE_STUDENT.user_name)
   const [email] = useState(FAKE_STUDENT.user_email)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   async function handleSave(e) {
     e.preventDefault()
@@ -20,9 +21,10 @@ export default function ProfilePage() {
     toast.success('Profile updated successfully!')
   }
 
-  function handleLogout() {
+  function confirmLogout() {
+    setShowLogoutConfirm(false)
     toast('Logged out. See you next time!', { icon: '👋' })
-    setTimeout(() => switchRole('user'), 1000)
+    setTimeout(() => logout(), 1000)
   }
 
   return (
@@ -124,7 +126,7 @@ export default function ProfilePage() {
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
             >
               <LogOut size={15} /> Log Out
@@ -132,6 +134,40 @@ export default function ProfilePage() {
           </div>
         </form>
       </div>
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <LogOut size={18} className="text-red-500" />
+              </div>
+              <button onClick={() => setShowLogoutConfirm(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            <h3 className="font-bold text-gray-900 text-base mb-1" style={{ fontFamily: 'Nunito, sans-serif' }}>
+              Log out?
+            </h3>
+            <p className="text-sm text-gray-500 mb-5">You'll be redirected to the home page.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={confirmLogout}
+                className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Yes, log out
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

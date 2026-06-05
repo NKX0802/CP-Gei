@@ -8,6 +8,7 @@ import {
 import { useRole } from '@/lib/roleContext'
 import { useTheme } from '@/lib/themeContext'
 import { FAKE_STUDENT, FAKE_ADMIN } from '@/lib/fakeData'
+import toast from 'react-hot-toast'
 
 const STUDENT_LINKS = [
   { href: '/dashboard',     label: 'Dashboard',     icon: LayoutDashboard },
@@ -23,10 +24,13 @@ export default function Navbar() {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const navRef = useRef(null)
 
-  function handleLogout() {
-    logout()
+  function confirmLogout() {
+    setShowLogoutConfirm(false)
+    toast('Logged out. See you next time!', { icon: '👋' })
+    setTimeout(() => logout(), 1000)
   }
   const currentUser = role === 'admin' ? FAKE_ADMIN : FAKE_STUDENT
 
@@ -63,6 +67,7 @@ export default function Navbar() {
   }
 
   return (
+    <>
     <nav
       ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 transition-all duration-300 ${
@@ -137,7 +142,7 @@ export default function Navbar() {
 
             {/* Logout */}
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               title="Log out"
               className="w-9 h-9 rounded-xl flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 active:bg-red-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
             >
@@ -222,7 +227,7 @@ export default function Navbar() {
 
           {/* Mobile logout */}
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutConfirm(true)}
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200 transition-all duration-150"
           >
             <LogOut size={18} />
@@ -231,5 +236,40 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
+
+    {showLogoutConfirm && (
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+              <LogOut size={18} className="text-red-500" />
+            </div>
+            <button onClick={() => setShowLogoutConfirm(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+              <X size={16} />
+            </button>
+          </div>
+          <h3 className="font-bold text-gray-900 text-base mb-1" style={{ fontFamily: 'Nunito, sans-serif' }}>
+            Log out?
+          </h3>
+          <p className="text-sm text-gray-500 mb-5">You'll be redirected to the home page.</p>
+          <div className="flex gap-3">
+            <button
+              onClick={confirmLogout}
+              className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              Yes, log out
+            </button>
+            <button
+              onClick={() => setShowLogoutConfirm(false)}
+              className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

@@ -14,14 +14,12 @@ export default function NotificationsPage() {
     <div className="min-h-screen bg-green-50 pt-16">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
             Notifications
           </h1>
         </div>
 
-        {/* List */}
         {NOTIFICATIONS.length > 0 ? (
           <div className="space-y-3">
             {NOTIFICATIONS.map(n => (
@@ -33,11 +31,8 @@ export default function NotificationsPage() {
                   <div className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
                     <Bell size={15} className="text-gray-500" />
                   </div>
-
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 leading-relaxed">
-                      {n.notification_message}
-                    </p>
+                    <p className="text-sm text-gray-800 leading-relaxed">{n.notification_message}</p>
                     <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.notification_created_at)}</p>
                   </div>
                 </div>
