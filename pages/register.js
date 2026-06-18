@@ -34,7 +34,19 @@ export default function RegisterPage() {
       return
     }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
+    })
+    const data = await res.json()
+
+    if (!data.success) {
+      toast.error(data.error || 'Registration failed.')
+      setLoading(false)
+      return
+    }
+
     toast.success('Account created! Please sign in.')
     router.push('/login')
   }
