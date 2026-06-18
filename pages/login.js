@@ -51,7 +51,7 @@ export default function LoginPage() {
     setEmail(account.email);
     setPassword(account.password);
     toast(`Demo credentials filled for ${account.label}`, {
-      icon: "✏️",
+      icon: "✏️6969",
       duration: 2000,
     });
   }
