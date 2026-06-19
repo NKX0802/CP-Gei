@@ -42,6 +42,8 @@ export default async function handler(req, res) {
     const token = await new SignJWT({
       user_id: user.user_id,
       user_role: user.user_role,
+      user_name: user.user_name,
+      user_email: user.user_email,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")

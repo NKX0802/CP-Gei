@@ -12,6 +12,7 @@ function AppContent({ Component, pageProps }) {
   const isAdminPage = router.pathname.startsWith('/admin')
   const isHomePage = router.pathname === '/'
   const isAuthPage = router.pathname === '/login' || router.pathname === '/register'
+  const isErrorPage = router.pathname === '/404' || router.pathname === '/403'
 
   const [hasMounted, setHasMounted] = useState(false)
   useEffect(() => { setHasMounted(true) }, [])
@@ -24,7 +25,7 @@ function AppContent({ Component, pageProps }) {
 
   return (
     <>
-      {!isAdminPage && !isHomePage && !isAuthPage && <Navbar />}
+      {!isAdminPage && !isHomePage && !isAuthPage && (!isErrorPage || role === 'user') && <Navbar />}
       <main>
         <Component {...pageProps} />
       </main>

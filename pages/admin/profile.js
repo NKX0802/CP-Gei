@@ -1,9 +1,8 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { User, Mail, Lock, Eye, EyeOff, Save, LogOut, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
 import { useRole } from '@/lib/roleContext'
-import { FAKE_ADMIN } from '@/lib/fakeData'
 
 export default function AdminProfilePage() {
   const { logout } = useRole()
@@ -14,16 +13,41 @@ export default function AdminProfilePage() {
     toast('Logged out. See you next time!', { icon: '👋' })
     setTimeout(() => logout(), 1000)
   }
-  const [name, setName] = useState(FAKE_ADMIN.user_name)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    async function loadProfile() {
+      const res = await fetch('/api/profile')
+      const data = await res.json()
+      if (data.success) {
+        setName(data.data.user_name)
+        setEmail(data.data.user_email)
+      }
+    }
+    loadProfile()
+  }, [])
+
   async function handleSave(e) {
     e.preventDefault()
     setSaving(true)
-    await new Promise(r => setTimeout(r, 800))
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password: password || undefined }),
+    })
+    const data = await res.json()
     setSaving(false)
+
+    if (!data.success) {
+      toast.error(data.error || 'Failed to update profile.')
+      return
+    }
+
+    setPassword('')
     toast.success('Profile updated successfully!')
   }
 
@@ -39,7 +63,7 @@ export default function AdminProfilePage() {
           </div>
           <div>
             <p className="font-bold text-gray-900 text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>{name}</p>
-            <p className="text-sm text-gray-500">{FAKE_ADMIN.user_email}</p>
+            <p className="text-sm text-gray-500">{email}</p>
             <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
               Administrator
             </span>
@@ -69,7 +93,7 @@ export default function AdminProfilePage() {
               <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
                 type="email"
-                value={FAKE_ADMIN.user_email}
+                value={email}
                 readOnly
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm text-gray-400 cursor-not-allowed"
               />
@@ -117,9 +141,11 @@ export default function AdminProfilePage() {
             <button
               type="button"
               onClick={() => setShowLogoutConfirm(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
+              title="Log out"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-red-50 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-100 will-change-transform hover:scale-105 active:scale-95 active:bg-red-200 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
             >
-              <LogOut size={15} /> Log Out
+              <LogOut size={16} />
+              <span>Log Out</span>
             </button>
           </div>
         </form>

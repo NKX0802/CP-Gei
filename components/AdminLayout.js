@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { useRole } from "@/lib/roleContext";
 import { useTheme } from "@/lib/themeContext";
-import { FAKE_ADMIN } from "@/lib/fakeData";
 import toast from "react-hot-toast";
 
 const ADMIN_LINKS = [
@@ -26,7 +25,6 @@ const ADMIN_LINKS = [
   { href: "/admin/bookings", label: "Bookings", icon: Calendar },
   { href: "/admin/noshows", label: "No-Shows", icon: AlertCircle },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
-  { href: "/admin/profile", label: "Profile", icon: User },
 ];
 
 function NavLink({ href, label, icon: Icon, active }) {
@@ -48,7 +46,11 @@ function NavLink({ href, label, icon: Icon, active }) {
 
 export default function AdminLayout({ children, title }) {
   const router = useRouter();
-  const { switchRole, logout } = useRole();
+  const { user, logout } = useRole();
+  const currentUser = {
+    user_name: user?.user_name || "...",
+    user_email: user?.user_email || "",
+  };
   const { dark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -134,24 +136,16 @@ export default function AdminLayout({ children, title }) {
                 {dark ? <Sun size={17} /> : <Moon size={17} />}
               </button>
 
-              {/* Switch to User */}
-              <button
-                onClick={() => switchRole("user")}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200"
-              >
-                <User size={13} /> User
-              </button>
-
               {/* Admin user chip */}
               <Link
                 href="/admin/profile"
                 className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 group"
               >
                 <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                  {FAKE_ADMIN.user_name.charAt(0)}
+                  {currentUser.user_name.charAt(0)}
                 </div>
                 <span className="text-xs font-semibold text-gray-700 group-hover:text-emerald-700 transition-colors max-w-24 truncate">
-                  {FAKE_ADMIN.user_name.split(" ")[0]}
+                  {currentUser.user_name.split(" ")[0]}
                 </span>
                 <User
                   size={12}
@@ -212,15 +206,8 @@ export default function AdminLayout({ children, title }) {
               );
             })}
 
-            {/* Mobile role / logout actions */}
+            {/* Mobile logout action */}
             <div className="pt-3 mt-2 border-t border-gray-100 space-y-1">
-              <button
-                onClick={() => switchRole("user")}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-emerald-50 active:text-emerald-700 transition-all duration-150"
-              >
-                <User size={18} />
-                <span className="flex-1">Switch to User View</span>
-              </button>
               <button
                 onClick={() => setShowLogoutConfirm(true)}
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200 transition-all duration-150"
@@ -236,13 +223,13 @@ export default function AdminLayout({ children, title }) {
               className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-emerald-50 transition-all duration-150"
             >
               <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-bold">
-                {FAKE_ADMIN.user_name.charAt(0)}
+                {currentUser.user_name.charAt(0)}
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-800">
-                  {FAKE_ADMIN.user_name}
+                  {currentUser.user_name}
                 </p>
-                <p className="text-xs text-gray-400">{FAKE_ADMIN.user_email}</p>
+                <p className="text-xs text-gray-400">{currentUser.user_email}</p>
               </div>
             </Link>
           </div>
