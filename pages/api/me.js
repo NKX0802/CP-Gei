@@ -1,4 +1,5 @@
 import { jwtVerify } from "jose";
+import { pool } from "@/lib/db";
 
 export default async function handler(req, res) {
   const token = req.cookies.token;
@@ -13,15 +14,16 @@ export default async function handler(req, res) {
       new TextEncoder().encode(process.env.JWT_SECRET),
     );
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        user_id: payload.user_id,
-        user_role: payload.user_role,
-        user_name: payload.user_name,
-        user_email: payload.user_email,
-      },
-    });
+    const [users] = await pool.query(
+      "SELECT user_id, user_name, user_email, user_role FROM users WHERE user_id = ?",
+      [payload.user_id],
+    );
+
+    if (users.length === 0) {
+      return res.status(401).json({ success: false, error: "User not found." });
+    }
+
+    return res.status(200).json({ success: true, data: users[0] });
   } catch (err) {
     return res
       .status(401)
