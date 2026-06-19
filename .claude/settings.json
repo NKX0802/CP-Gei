@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node _check_admin.mjs)",
+      "Bash(npx eslint *)"
+    ]
+  }
+}

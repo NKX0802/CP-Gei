@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import {
   Mail,
   Lock,
@@ -40,8 +41,9 @@ const DEMO_ACCOUNTS = [
 ];
 
 export default function LoginPage() {
-  const { switchRole } = useRole();
+  const { refreshRole } = useRole();
   const { dark } = useTheme();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +53,7 @@ export default function LoginPage() {
     setEmail(account.email);
     setPassword(account.password);
     toast(`Demo credentials filled for ${account.label}`, {
-      icon: "✏️6969",
+      icon: "✏️",
       duration: 2000,
     });
   }
@@ -77,7 +79,8 @@ export default function LoginPage() {
     }
 
     toast.success(`Welcome back, ${data.data.user_name.split(" ")[0]}!`);
-    switchRole(data.data.user_role);
+    const role = await refreshRole();
+    router.push(role === "admin" ? "/admin/dashboard" : "/dashboard");
   }
 
   return (

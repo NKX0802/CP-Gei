@@ -10,14 +10,12 @@ import {
   User,
   Menu,
   X,
-  Shield,
   Sun,
   Moon,
   LogOut,
 } from "lucide-react";
 import { useRole } from "@/lib/roleContext";
 import { useTheme } from "@/lib/themeContext";
-import { FAKE_STUDENT, FAKE_ADMIN } from "@/lib/fakeData";
 import toast from "react-hot-toast";
 
 const STUDENT_LINKS = [
@@ -29,7 +27,7 @@ const STUDENT_LINKS = [
 ];
 
 export default function Navbar() {
-  const { role, switchRole, logout } = useRole();
+  const { user, logout } = useRole();
   const { dark, toggleTheme } = useTheme();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,7 +40,10 @@ export default function Navbar() {
     toast("Logged out. See you next time!", { icon: "👋" });
     setTimeout(() => logout(), 1000);
   }
-  const currentUser = role === "admin" ? FAKE_ADMIN : FAKE_STUDENT;
+  const currentUser = {
+    user_name: user?.user_name || "...",
+    user_email: user?.user_email || "",
+  };
 
   useEffect(() => {
     function onScroll() {
@@ -128,30 +129,6 @@ export default function Navbar() {
                 {dark ? <Sun size={17} /> : <Moon size={17} />}
               </button>
 
-              {/* Role switcher */}
-              <div className="flex items-center bg-gray-100 rounded-full p-0.5 gap-0.5">
-                <button
-                  onClick={() => switchRole("user")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-                    role === "user"
-                      ? "bg-white text-emerald-700 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <User size={13} /> User
-                </button>
-                <button
-                  onClick={() => switchRole("admin")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-                    role === "admin"
-                      ? "bg-white text-emerald-700 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <Shield size={13} /> Admin
-                </button>
-              </div>
-
               {/* User chip */}
               <Link
                 href="/profile"
@@ -221,35 +198,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-
-            {/* Mobile role switcher */}
-            <div className="pt-3 mt-2 border-t border-gray-100">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 mb-2">
-                Demo Role
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => switchRole("user")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
-                    role === "user"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700"
-                  }`}
-                >
-                  <User size={15} /> User
-                </button>
-                <button
-                  onClick={() => switchRole("admin")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
-                    role === "admin"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700"
-                  }`}
-                >
-                  <Shield size={15} /> Admin
-                </button>
-              </div>
-            </div>
 
             {/* Mobile profile */}
             <Link

@@ -1,23 +1,46 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { User, Mail, Lock, Eye, EyeOff, Save, LogOut, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useRole } from '@/lib/roleContext'
-import { FAKE_STUDENT } from '@/lib/fakeData'
 
 export default function ProfilePage() {
   const { logout } = useRole()
-  const [name, setName] = useState(FAKE_STUDENT.user_name)
-  const [email] = useState(FAKE_STUDENT.user_email)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
+  useEffect(() => {
+    async function loadProfile() {
+      const res = await fetch('/api/profile')
+      const data = await res.json()
+      if (data.success) {
+        setName(data.data.user_name)
+        setEmail(data.data.user_email)
+      }
+    }
+    loadProfile()
+  }, [])
+
   async function handleSave(e) {
     e.preventDefault()
     setSaving(true)
-    await new Promise(r => setTimeout(r, 800))
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password: password || undefined }),
+    })
+    const data = await res.json()
     setSaving(false)
+
+    if (!data.success) {
+      toast.error(data.error || 'Failed to update profile.')
+      return
+    }
+
+    setPassword('')
     toast.success('Profile updated successfully!')
   }
 
@@ -127,9 +150,11 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setShowLogoutConfirm(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
+              title="Log out"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-red-50 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-100 will-change-transform hover:scale-105 active:scale-95 active:bg-red-200 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
             >
-              <LogOut size={15} /> Log Out
+              <LogOut size={16} />
+              <span>Log Out</span>
             </button>
           </div>
         </form>
