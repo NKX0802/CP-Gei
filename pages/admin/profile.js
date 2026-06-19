@@ -5,7 +5,7 @@ import AdminLayout from '@/components/AdminLayout'
 import { useRole } from '@/lib/roleContext'
 
 export default function AdminProfilePage() {
-  const { logout } = useRole()
+  const { logout, refreshRole } = useRole()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   function confirmLogout() {
@@ -48,6 +48,7 @@ export default function AdminProfilePage() {
     }
 
     setPassword('')
+    await refreshRole()
     toast.success('Profile updated successfully!')
   }
 

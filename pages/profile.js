@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { useRole } from '@/lib/roleContext'
 
 export default function ProfilePage() {
-  const { logout } = useRole()
+  const { logout, refreshRole } = useRole()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -41,6 +41,7 @@ export default function ProfilePage() {
     }
 
     setPassword('')
+    await refreshRole()
     toast.success('Profile updated successfully!')
   }
 
