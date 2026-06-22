@@ -8,20 +8,23 @@ import { useRouter } from 'next/router'
 
 function AppContent({ Component, pageProps }) {
   const router = useRouter()
-  const { role } = useRole()
+  const { role, loading: roleLoading } = useRole()
   const isAdminPage = router.pathname.startsWith('/admin')
   const isHomePage = router.pathname === '/'
   const isAuthPage = router.pathname === '/login' || router.pathname === '/register'
   const isErrorPage = router.pathname === '/404' || router.pathname === '/403'
+  const isPublicPage = isHomePage || isAuthPage || isErrorPage
 
   const [hasMounted, setHasMounted] = useState(false)
   useEffect(() => { setHasMounted(true) }, [])
   useEffect(() => {
-    if (!hasMounted) return
+    if (!hasMounted || roleLoading) return
     if (isAdminPage && role !== 'admin') {
       router.replace('/403')
+    } else if (!isAdminPage && !isPublicPage && !role) {
+      router.replace('/login')
     }
-  }, [hasMounted, role, isAdminPage])
+  }, [hasMounted, roleLoading, role, isAdminPage, isPublicPage])
 
   return (
     <>

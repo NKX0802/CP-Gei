@@ -49,9 +49,10 @@ export default async function handler(req, res) {
       .setExpirationTime("7d")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 
+    const secure = process.env.NODE_ENV === "production" ? " Secure;" : "";
     res.setHeader(
       "Set-Cookie",
-      `token=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Lax`,
+      `token=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Lax;${secure}`,
     );
 
     return res.status(200).json({
