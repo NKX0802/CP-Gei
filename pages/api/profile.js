@@ -55,6 +55,31 @@ export default async function handler(req, res) {
       }
 
       if (password) {
+        const { currentPassword } = req.body;
+        if (!currentPassword) {
+          return res
+            .status(400)
+            .json({ success: false, error: "Original password is required." });
+        }
+
+        const [users] = await pool.query(
+          "SELECT user_password FROM users WHERE user_id = ?",
+          [payload.user_id],
+        );
+
+        if (users.length === 0) {
+          return res
+            .status(404)
+            .json({ success: false, error: "User not found." });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, users[0].user_password);
+        if (!isMatch) {
+          return res
+            .status(400)
+            .json({ success: false, error: "Incorrect original password." });
+        }
+
         if (password.length < 8) {
           return res
             .status(400)

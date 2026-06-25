@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { User, Mail, Lock, Eye, EyeOff, Save, LogOut, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
@@ -16,7 +16,9 @@ export default function AdminProfilePage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -33,11 +35,19 @@ export default function AdminProfilePage() {
 
   async function handleSave(e) {
     e.preventDefault()
+    if (password && !currentPassword) {
+      toast.error('Original password is required to change your password.')
+      return
+    }
     setSaving(true)
     const res = await fetch('/api/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password: password || undefined }),
+      body: JSON.stringify({
+        name,
+        password: password || undefined,
+        currentPassword: currentPassword || undefined,
+      }),
     })
     const data = await res.json()
     setSaving(false)
@@ -48,6 +58,7 @@ export default function AdminProfilePage() {
     }
 
     setPassword('')
+    setCurrentPassword('')
     await refreshRole()
     toast.success('Profile updated successfully!')
   }
@@ -102,6 +113,30 @@ export default function AdminProfilePage() {
             <p className="text-[11px] text-gray-400 mt-1">Email cannot be changed</p>
           </div>
 
+          {/* Original password */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Original password</label>
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+                placeholder="Required if changing password"
+                className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition placeholder-gray-300 text-gray-900"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(s => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* New password */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">New password</label>
             <div className="relative">
