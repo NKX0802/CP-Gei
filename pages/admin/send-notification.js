@@ -321,7 +321,7 @@ export default function SendNotificationPage() {
                           </span>
                         </div>
                         <p className="text-sm font-semibold text-gray-800">{n.title}</p>
-                        <p className="text-sm text-gray-600 leading-relaxed">{n.message}</p>
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words">{n.message}</p>
                         <p className="text-[11px] text-gray-400 mt-1">{timeAgo(n.created_at)}</p>
                       </div>
                       <button

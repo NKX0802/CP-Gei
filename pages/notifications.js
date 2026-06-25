@@ -194,7 +194,7 @@ export default function NotificationsPage() {
                           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Unread" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">{n.message}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words">{n.message}</p>
                       <div className="flex items-center gap-2 flex-wrap mt-2">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.bg} ${cfg.text}`}>
                           {cfg.label}
