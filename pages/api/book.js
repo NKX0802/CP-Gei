@@ -118,11 +118,12 @@ export default async function handler(req, res) {
 
       // ── Insert a confirmation notification for the user ────────────────────
       await connection.query(
-        `INSERT INTO notifications (user_id, notification_message, notification_created_at)
-         VALUES (?, ?, NOW())`,
+        `INSERT INTO notifications (user_id, title, message, notification_type, is_read, created_by, created_at)
+         VALUES (?, ?, ?, 'booking', 0, NULL, NOW())`,
         [
           user.user_id,
-          `✅ Your booking for ${facility.facility_name} on ${booking_date} (${booking_time_slot}) has been confirmed. Booking ID: #${newBookingId}`,
+          'Booking Confirmed',
+          `Your booking for ${facility.facility_name} on ${booking_date} (${booking_time_slot}) has been confirmed. Booking ID: #${newBookingId}`,
         ]
       )
 

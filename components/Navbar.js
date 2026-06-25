@@ -31,7 +31,29 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef(null);
+
+  // Refresh the unread notification badge whenever the user is known and on navigation
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    let active = true;
+    async function loadUnreadCount() {
+      try {
+        const res = await fetch("/api/notifications/unread-count");
+        const data = await res.json();
+        if (active && data.success) setUnreadCount(data.data.unread);
+      } catch {
+        // silently ignore — badge just won't update
+      }
+    }
+    loadUnreadCount();
+    return () => { active = false; };
+  }, [user, router.pathname]);
 
   function confirmLogout() {
     setShowLogoutConfirm(false);
@@ -64,7 +86,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  function NavLink({ href, label, icon: Icon }) {
+  function NavLink({ href, label, icon: Icon, badge }) {
     const active =
       router.pathname === href || router.pathname.startsWith(href + "/");
     return (
@@ -75,6 +97,11 @@ export default function Navbar() {
       >
         <Icon size={15} className="shrink-0" />
         {label}
+        {badge > 0 && (
+          <span className="flex items-center justify-center min-w-4.5 h-4.5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+            {badge > 9 ? "9+" : badge}
+          </span>
+        )}
         <span
           className={`absolute -bottom-1 left-0 h-0.5 bg-emerald-600 rounded-full transition-all duration-300
           ${active ? "w-full" : "w-0 group-hover:w-full"}`}
@@ -112,7 +139,11 @@ export default function Navbar() {
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-6">
               {STUDENT_LINKS.map((link) => (
-                <NavLink key={link.href} {...link} />
+                <NavLink
+                  key={link.href}
+                  {...link}
+                  badge={link.href === "/notifications" ? unreadCount : 0}
+                />
               ))}
             </div>
 
@@ -181,6 +212,7 @@ export default function Navbar() {
           <div className="bg-white border-t border-gray-100 px-4 py-4 space-y-1">
             {STUDENT_LINKS.map(({ href, label, icon: Icon }) => {
               const active = router.pathname === href;
+              const badge = href === "/notifications" ? unreadCount : 0;
               return (
                 <Link
                   key={href}
@@ -193,6 +225,11 @@ export default function Navbar() {
                 >
                   <Icon size={18} />
                   <span className="flex-1">{label}</span>
+                  {badge > 0 && (
+                    <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {badge > 9 ? "9+" : badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}

@@ -140,18 +140,23 @@ so it's always clear what they link to.
 
 ### notifications
 
-| Column                  | Type     | Size | Key        | Null                                                              |
-| ----------------------- | -------- | ---- | ---------- | ----------------------------------------------------------------- |
-| notification_id         | INT      | —    | PK         | NOT NULL                                                          |
-| user_id                 | INT      | —    | FK → users | **NULL** (NULL = sent to ALL users; a value = that specific user) |
-| notification_message    | VARCHAR  | 255  |            | NOT NULL                                                          |
-| notification_created_at | DATETIME | —    |            | NOT NULL                                                          |
+| Column             | Type     | Size | Key             | Null                                                |
+| ------------------ | -------- | ---- | --------------- | ---------------------------------------------------- |
+| notification_id    | INT      | —    | PK              | NOT NULL                                             |
+| user_id             | INT      | —    | FK → users      | NOT NULL (the recipient — one row per recipient, no broadcast rows) |
+| title               | VARCHAR  | 150  |                 | NOT NULL                                             |
+| message             | TEXT     | —    |                 | NOT NULL                                             |
+| notification_type   | VARCHAR  | 20   |                 | NOT NULL (see fixed values below, default `general`) |
+| is_read             | TINYINT(1) | —  |                 | NOT NULL (default `0`)                               |
+| created_by          | INT      | —    | FK → users      | **NULL** (NULL = system-generated; a value = the admin who sent it) |
+| created_at          | DATETIME | —    |                 | NOT NULL (default `CURRENT_TIMESTAMP`)               |
 
 **Fixed values everyone must use exactly:**
 
 - `user_role`: `user`, `admin`
 - `facility_status`: `open`, `closed`
 - `booking_status`: `booked`, `checked-in`, `no-show`, `cancelled`
+- `notification_type`: `general`, `announcement`, `booking`, `check-in`, `no-show`, `cancelled`
 
 ---
 
@@ -235,8 +240,15 @@ No-Show Report (users with too many no-shows)
 - **No-show rule:** if `/api/checkin/verify` is called more than 15 minutes after the
   slot start on a still-`booked` booking, it's marked `no-show` instead (checked on
   demand at scan time — there's no background job).
-- **Notifications:** `user_id` set = message to one user (e.g. "your booking was
-  cancelled"); `user_id` NULL = broadcast to everyone (e.g. "Court A closed for repairs").
+- **Notifications:** every row belongs to exactly one `user_id`. Admins send via
+  `/admin/send-notification` → `POST /api/admin/notifications/send`, which inserts one
+  row per recipient (`sendTo: 'single'` → that user; `sendTo: 'all'` → one row per
+  `user_role = 'user'`), stamping `created_by` with the admin's `user_id`. The system
+  also auto-inserts notifications (`created_by = NULL`) on booking confirmation
+  (`type: booking`), cancellation (`type: cancelled`), successful check-in
+  (`type: check-in`), and no-show (`type: no-show`). Users view/mark them at
+  `/notifications` via `GET /api/notifications` and `POST /api/notifications/mark-read`
+  (or `mark-all-read`); the navbar badge reads `GET /api/notifications/unread-count`.
 
 ---
 

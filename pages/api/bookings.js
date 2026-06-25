@@ -82,21 +82,11 @@ export default async function handler(req, res) {
         [bookingId]
       )
 
-      // Get facility name for the notification message
-      const [facilities] = await pool.query(
-        'SELECT facility_name FROM facilities WHERE facility_id = ?',
-        [booking.facility_id]
-      )
-      const facilityName = facilities[0]?.facility_name || 'Facility'
-
       // Insert a cancellation notification for the user
       await pool.query(
-        `INSERT INTO notifications (user_id, notification_message, notification_created_at)
-         VALUES (?, ?, NOW())`,
-        [
-          user.user_id,
-          `🚫 Your booking for ${facilityName} on ${booking.booking_date} (${booking.booking_time_slot}) has been cancelled.`,
-        ]
+        `INSERT INTO notifications (user_id, title, message, notification_type, is_read, created_by, created_at)
+         VALUES (?, 'Booking Cancelled', 'Your booking has been cancelled successfully.', 'cancelled', 0, NULL, NOW())`,
+        [user.user_id]
       )
 
       return res.status(200).json({ success: true, message: 'Booking cancelled.' })

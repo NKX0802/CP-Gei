@@ -25,7 +25,7 @@ const ADMIN_LINKS = [
   { href: "/admin/facilities", label: "Facilities", icon: Building2 },
   { href: "/admin/bookings", label: "Bookings", icon: Calendar },
   { href: "/admin/noshows", label: "No-Shows", icon: AlertCircle },
-  { href: "/admin/notifications", label: "Notifications", icon: Bell },
+  { href: "/admin/send-notification", label: "Send Notification", icon: Bell },
   { href: "/admin/qr-scan", label: "Scan QR", icon: QrCode },
 ];
 

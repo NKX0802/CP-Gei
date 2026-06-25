@@ -53,10 +53,15 @@ CREATE TABLE IF NOT EXISTS favourites (
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
-  notification_id         INT          NOT NULL AUTO_INCREMENT,
-  user_id                 INT          NULL,
-  notification_message    VARCHAR(255) NOT NULL,
-  notification_created_at DATETIME     NOT NULL,
+  notification_id   INT          NOT NULL AUTO_INCREMENT,
+  user_id            INT          NOT NULL,
+  title              VARCHAR(150) NOT NULL,
+  message            TEXT         NOT NULL,
+  notification_type  VARCHAR(20)  NOT NULL DEFAULT 'general',
+  is_read             TINYINT(1)   NOT NULL DEFAULT 0,
+  created_by          INT          NULL,
+  created_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (notification_id),
-  CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+  CONSTRAINT fk_notifications_user    FOREIGN KEY (user_id)    REFERENCES users(user_id),
+  CONSTRAINT fk_notifications_creator FOREIGN KEY (created_by) REFERENCES users(user_id)
 );

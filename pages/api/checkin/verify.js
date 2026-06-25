@@ -43,7 +43,7 @@ export default async function handler(req, res) {
   try {
     // 4. Look up the booking this token belongs to (not scoped to the caller)
     const [bookings] = await pool.query(
-      `SELECT b.booking_id, DATE_FORMAT(b.booking_date, '%Y-%m-%d') AS booking_date,
+      `SELECT b.booking_id, b.user_id, DATE_FORMAT(b.booking_date, '%Y-%m-%d') AS booking_date,
               b.booking_time_slot, b.booking_status,
               b.checked_in_at, b.no_show_marked_at,
               f.facility_name, u.user_name
@@ -102,6 +102,12 @@ export default async function handler(req, res) {
       )
       status = 'no-show'
       newlyMarkedNoShow = true
+
+      await pool.query(
+        `INSERT INTO notifications (user_id, title, message, notification_type, is_read, created_by, created_at)
+         VALUES (?, 'No-Show Recorded', 'You missed the 15-minute check-in window. Your booking has been marked as no-show.', 'no-show', 0, NULL, NOW())`,
+        [booking.user_id]
+      )
     }
 
     // 7. Resolve outcome
@@ -112,6 +118,13 @@ export default async function handler(req, res) {
          WHERE booking_id = ?`,
         [booking.booking_id]
       )
+
+      await pool.query(
+        `INSERT INTO notifications (user_id, title, message, notification_type, is_read, created_by, created_at)
+         VALUES (?, 'Check-In Successful', 'You have successfully checked in for your booking.', 'check-in', 0, NULL, NOW())`,
+        [booking.user_id]
+      )
+
       return res.status(200).json({
         success: true,
         message: `Checked in: ${booking.user_name} — ${booking.facility_name}`,

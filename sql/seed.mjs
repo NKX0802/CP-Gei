@@ -316,27 +316,24 @@ async function seed() {
 
   // ── 5. NOTIFICATIONS ─────────────────────────────────────────────────────
   await pool.query('DELETE FROM notifications WHERE user_id = ?', [seedUser.user_id])
-  await pool.query('DELETE FROM notifications WHERE user_id IS NULL') // clear old broadcasts
 
   const notifications = [
-    // Broadcasts (user_id = NULL — visible to everyone)
-    { uid: null, msg: '🏀 Basketball Court will be closed for resurfacing from 14–16 July. Plan your bookings accordingly.', created: malaysiaDatetime(-5) },
-    { uid: null, msg: '📢 New facility added: Video Recording Kit is now available for booking. Check it out under Equipment.', created: malaysiaDatetime(-10) },
-    { uid: null, msg: '⚠️ Reminder: QR check-in must be done within 15 minutes of your booking slot start time to avoid a no-show.', created: malaysiaDatetime(-20) },
-    // User-specific
-    { uid: seedUser.user_id, msg: `✅ Your booking for Discussion Room A on ${malaysiaDateFromNow(3)} (10:00–11:00) has been confirmed.`, created: malaysiaDatetime(-1) },
-    { uid: seedUser.user_id, msg: `✅ Your booking for Basketball Court on ${malaysiaDateFromNow(5)} (15:00–16:00) has been confirmed.`, created: malaysiaDatetime(-1) },
-    { uid: seedUser.user_id, msg: '❌ Your booking for Projector Set A was cancelled. Reason: Admin: Facility under maintenance.', created: malaysiaDatetime(-42) },
-    { uid: seedUser.user_id, msg: `🚫 You were marked as a no-show for Discussion Room A on ${malaysiaDateFromNow(-20)}. Repeated no-shows may affect booking privileges.`, created: malaysiaDatetime(-20) },
+    { title: 'Facility Closure', msg: 'Basketball Court will be closed for resurfacing from 14–16 July. Plan your bookings accordingly.', type: 'announcement', created: malaysiaDatetime(-5) },
+    { title: 'New Facility Added', msg: 'Video Recording Kit is now available for booking. Check it out under Equipment.', type: 'announcement', created: malaysiaDatetime(-10) },
+    { title: 'Check-In Reminder', msg: 'Reminder: QR check-in must be done within 15 minutes of your booking slot start time to avoid a no-show.', type: 'general', created: malaysiaDatetime(-20) },
+    { title: 'Booking Confirmed', msg: `Your booking for Discussion Room A on ${malaysiaDateFromNow(3)} (10:00–11:00) has been confirmed.`, type: 'booking', created: malaysiaDatetime(-1) },
+    { title: 'Booking Confirmed', msg: `Your booking for Basketball Court on ${malaysiaDateFromNow(5)} (15:00–16:00) has been confirmed.`, type: 'booking', created: malaysiaDatetime(-1) },
+    { title: 'Booking Cancelled', msg: 'Your booking for Projector Set A was cancelled. Reason: Admin: Facility under maintenance.', type: 'cancelled', created: malaysiaDatetime(-42) },
+    { title: 'No-Show Recorded', msg: `You were marked as a no-show for Discussion Room A on ${malaysiaDateFromNow(-20)}. Repeated no-shows may affect booking privileges.`, type: 'no-show', created: malaysiaDatetime(-20) },
   ]
 
   for (const n of notifications) {
     await pool.query(
-      'INSERT INTO notifications (user_id, notification_message, notification_created_at) VALUES (?, ?, ?)',
-      [n.uid, n.msg, n.created]
+      'INSERT INTO notifications (user_id, title, message, notification_type, is_read, created_by, created_at) VALUES (?, ?, ?, ?, 0, NULL, ?)',
+      [seedUser.user_id, n.title, n.msg, n.type, n.created]
     )
   }
-  console.log(`✅ Notifications: ${notifications.length} inserted (3 broadcasts + 4 for ${seedUser.user_name})`)
+  console.log(`✅ Notifications: ${notifications.length} inserted for ${seedUser.user_name}`)
 
   // ── SUMMARY ───────────────────────────────────────────────────────────────
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
