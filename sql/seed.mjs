@@ -262,12 +262,38 @@ async function seed() {
 
   const bookingIds = []
   for (const b of bookings) {
+    const slotStart = b.slot.split('-')[0]
+    let checkedInAt = null
+    let noShowMarkedAt = null
+
+    if (b.status === 'checked-in') {
+      // 5 minutes after slot start
+      const d = new Date(`${b.date}T${slotStart}:00`)
+      d.setMinutes(d.getMinutes() + 5)
+      const yr = d.getFullYear()
+      const mo = String(d.getMonth() + 1).padStart(2, '0')
+      const dy = String(d.getDate()).padStart(2, '0')
+      const hr = String(d.getHours()).padStart(2, '0')
+      const mn = String(d.getMinutes()).padStart(2, '0')
+      checkedInAt = `${yr}-${mo}-${dy} ${hr}:${mn}:00`
+    } else if (b.status === 'no-show') {
+      // 15 minutes after slot start
+      const d = new Date(`${b.date}T${slotStart}:00`)
+      d.setMinutes(d.getMinutes() + 15)
+      const yr = d.getFullYear()
+      const mo = String(d.getMonth() + 1).padStart(2, '0')
+      const dy = String(d.getDate()).padStart(2, '0')
+      const hr = String(d.getHours()).padStart(2, '0')
+      const mn = String(d.getMinutes()).padStart(2, '0')
+      noShowMarkedAt = `${yr}-${mo}-${dy} ${hr}:${mn}:00`
+    }
+
     const [result] = await pool.query(
       `INSERT INTO bookings
          (user_id, facility_id, booking_date, booking_time_slot, booking_group_size,
-          booking_status, booking_cancel_reason, booking_created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [seedUser.user_id, b.fid, b.date, b.slot, b.size, b.status, b.reason || null, b.created]
+          booking_status, booking_cancel_reason, booking_created_at, checked_in_at, no_show_marked_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [seedUser.user_id, b.fid, b.date, b.slot, b.size, b.status, b.reason || null, b.created, checkedInAt, noShowMarkedAt]
     )
     bookingIds.push(result.insertId)
   }

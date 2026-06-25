@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   booking_status        VARCHAR(15)  NOT NULL DEFAULT 'booked',
   booking_cancel_reason VARCHAR(255) NULL,
   booking_created_at    DATETIME     NOT NULL,
+  checked_in_at         DATETIME     NULL,
+  no_show_marked_at     DATETIME     NULL,
   PRIMARY KEY (booking_id),
   CONSTRAINT fk_bookings_user     FOREIGN KEY (user_id)     REFERENCES users(user_id),
   CONSTRAINT fk_bookings_facility FOREIGN KEY (facility_id) REFERENCES facilities(facility_id)

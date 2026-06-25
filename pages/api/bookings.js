@@ -23,7 +23,8 @@ export default async function handler(req, res) {
           b.booking_id, b.user_id, b.facility_id,
           b.booking_date, b.booking_time_slot, b.booking_group_size,
           b.booking_status, b.booking_cancel_reason, b.booking_created_at,
-          f.facility_name, f.facility_type, f.facility_image_url, f.facility_capacity
+          b.checked_in_at, b.no_show_marked_at,
+          f.facility_name, f.facility_type, f.facility_description, f.facility_image_url, f.facility_capacity
         FROM bookings b
         JOIN facilities f ON f.facility_id = b.facility_id
         WHERE b.user_id = ?
