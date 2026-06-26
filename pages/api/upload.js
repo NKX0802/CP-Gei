@@ -1,13 +1,13 @@
-// API: POST /api/upload — receive a base64-encoded image, save to public/images/facilities/
-// Returns: { success: true, url: '/images/facilities/filename.jpg' }
+// API: POST /api/upload — receive a base64-encoded image, store it on Vercel Blob
+// Returns: { success: true, url: 'https://<store>.public.blob.vercel-storage.com/facilities/...' }
 // Admin only
 //
-// TODO before deploying to Vercel: this writes to the local filesystem, which is
-// read-only on Vercel's serverless functions and will fail in production.
-// Switch back to the @vercel/blob version (using put()) once a Blob store is set up.
+// Vercel's serverless functions have a read-only filesystem, so images can't be
+// written to /public at runtime — Vercel Blob gives each upload a permanent public URL instead.
+// Requires BLOB_READ_WRITE_TOKEN (auto-set by Vercel when a Blob store is connected to
+// the project; for local dev, copy it from Vercel → Storage → your Blob store → .env.local tab).
 
-import fs from 'fs'
-import path from 'path'
+import { put } from '@vercel/blob'
 import { getUser } from '@/lib/auth'
 
 // Increase body size limit to allow image uploads (up to 8 MB base64)
@@ -23,6 +23,13 @@ export default async function handler(req, res) {
   const admin = await getUser(req)
   if (!admin) return res.status(401).json({ success: false, error: 'Not logged in.' })
   if (admin.user_role !== 'admin') return res.status(403).json({ success: false, error: 'Admin access required.' })
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(500).json({
+      success: false,
+      error: 'Image storage is not configured. Set BLOB_READ_WRITE_TOKEN (Vercel → Storage → Blob store → .env.local tab) and restart the server.',
+    })
+  }
 
   const { image, filename } = req.body || {}
   if (!image || !filename) {
@@ -45,12 +52,13 @@ export default async function handler(req, res) {
 
   // Build a safe, unique filename
   const safeName = `${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-  const dir = path.join(process.cwd(), 'public', 'images', 'facilities')
 
   try {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
-    fs.writeFileSync(path.join(dir, safeName), buffer)
-    return res.status(200).json({ success: true, url: `/images/facilities/${safeName}` })
+    const blob = await put(`facilities/${safeName}`, buffer, {
+      access: 'public',
+      contentType: `image/${matches[1]}`,
+    })
+    return res.status(200).json({ success: true, url: blob.url })
   } catch (err) {
     console.error('POST /api/upload error:', err)
     return res.status(500).json({ success: false, error: 'Failed to save image.' })
