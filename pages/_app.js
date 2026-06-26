@@ -5,6 +5,7 @@ import { RoleProvider, useRole } from '@/lib/roleContext'
 import { ThemeProvider } from '@/lib/themeContext'
 import Navbar from '@/components/Navbar'
 import { useRouter } from 'next/router'
+import { nunito } from '@/lib/fonts'
 
 function AppContent({ Component, pageProps }) {
   const router = useRouter()
@@ -24,7 +25,7 @@ function AppContent({ Component, pageProps }) {
   }, [hasMounted, role, isAdminPage])
 
   return (
-    <>
+    <div className={nunito.className}>
       {!isAdminPage && !isHomePage && !isAuthPage && (!isErrorPage || role === 'user') && <Navbar />}
       <main>
         <Component {...pageProps} />
@@ -34,10 +35,11 @@ function AppContent({ Component, pageProps }) {
         toastOptions={{
           duration: 3000,
           style: {
-            fontFamily: 'Outfit, sans-serif',
+            fontFamily: 'inherit',
             fontSize: '14px',
             borderRadius: '10px',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+            boxShadow: '0 1px 0 rgba(0,0,0,0.08)',
+            border: '1px solid #e5e7eb',
           },
           success: {
             iconTheme: { primary: '#059669', secondary: '#fff' },
@@ -47,7 +49,7 @@ function AppContent({ Component, pageProps }) {
           },
         }}
       />
-    </>
+    </div>
   )
 }
 

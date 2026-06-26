@@ -31,7 +31,7 @@ export default function AdminSidebar() {
         </div>
         {!collapsed && (
           <span className="text-base font-bold tracking-tight" style={{ fontFamily: 'Nunito, sans-serif' }}>
-            Campus<span className="text-emerald-400">Book</span>
+            Flexi<span className="text-emerald-400">Book</span>
           </span>
         )}
       </div>

@@ -6,6 +6,7 @@ import {
   CheckCircle2, ChevronRight, Loader2, AlertTriangle,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Skeleton } from '@/components/Skeleton'
 
 export default function BookPage() {
   const router = useRouter()
@@ -130,8 +131,16 @@ export default function BookPage() {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-emerald-500" />
+      <div className="min-h-screen bg-primary-50 pt-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+          <Skeleton className="h-5 w-20 mb-5" />
+          <Skeleton className="h-7 w-48 mb-6" />
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-3">
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -139,10 +148,10 @@ export default function BookPage() {
   // ── Error state ──────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-primary-50 pt-16 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-4">{error}</p>
-          <Link href="/facilities" className="text-emerald-600 font-semibold hover:underline">← Back to Facilities</Link>
+          <Link href="/facilities" className="text-primary-600 font-semibold hover:underline">← Back to Facilities</Link>
         </div>
       </div>
     )
@@ -151,28 +160,28 @@ export default function BookPage() {
   // ── Missing query params ─────────────────────────────────────────────────
   if (!facility || !date || !slot) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-primary-50 pt-16 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-4">Invalid booking request.</p>
-          <Link href="/facilities" className="text-emerald-600 font-semibold hover:underline">← Back to Facilities</Link>
+          <Link href="/facilities" className="text-primary-600 font-semibold hover:underline">← Back to Facilities</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-green-50 pt-16">
+    <div className="min-h-screen bg-primary-50 pt-16">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
 
         <Link
           href={facility ? `/facilities/${facility.facility_id}` : '/facilities'}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-emerald-700 transition-colors mb-5 group"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary-700 transition-colors mb-5 group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back
         </Link>
 
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-6" style={{ fontFamily: 'Nunito, sans-serif' }}>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-6">
           {confirmed ? 'Booking Confirmed' : 'Confirm Your Booking'}
         </h1>
 
@@ -182,7 +191,7 @@ export default function BookPage() {
             <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} className="text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1" style={{ fontFamily: 'Nunito, sans-serif' }}>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">
               You&apos;re all set!
             </h2>
             <p className="text-sm text-gray-500 mb-5">
@@ -190,7 +199,7 @@ export default function BookPage() {
             </p>
 
             {/* Summary */}
-            <div className="bg-green-50 rounded-xl p-4 text-left mb-5 space-y-2">
+            <div className="bg-primary-50 rounded-xl p-4 text-left mb-5 space-y-2">
               <Detail icon={Building2} label="Facility" value={facility?.facility_name} />
               <Detail icon={Calendar} label="Date" value={date} />
               <Detail icon={Clock} label="Time" value={slot} />
@@ -204,7 +213,7 @@ export default function BookPage() {
             {/* Real check-in QR code */}
             <div className="inline-flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-xl border border-gray-200 mb-6">
               <div className="w-32 h-32 bg-white border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                {qrLoading && <Loader2 size={24} className="animate-spin text-emerald-500" />}
+                {qrLoading && <Loader2 size={24} className="animate-spin text-primary-500" />}
                 {qrError && !qrLoading && (
                   <AlertTriangle size={24} className="text-red-400" />
                 )}
@@ -220,7 +229,7 @@ export default function BookPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/dashboard"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 View My Bookings <ChevronRight size={15} />
               </Link>
@@ -256,7 +265,7 @@ export default function BookPage() {
                   <button
                     type="button"
                     onClick={() => setGroupSize(g => Math.max(1, g - 1))}
-                    className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 font-bold text-lg flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 active:scale-90 transition-all"
+                    className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 font-bold text-lg flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:scale-90 transition-all"
                   >
                     −
                   </button>
@@ -264,7 +273,7 @@ export default function BookPage() {
                   <button
                     type="button"
                     onClick={() => setGroupSize(g => Math.min(facility.facility_capacity, g + 1))}
-                    className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 font-bold text-lg flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 active:scale-90 transition-all"
+                    className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 font-bold text-lg flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:scale-90 transition-all"
                   >
                     +
                   </button>
@@ -277,7 +286,7 @@ export default function BookPage() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Booked by</label>
                   <div className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-200">
-                    <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                       {user.user_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -291,7 +300,7 @@ export default function BookPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 shadow-md shadow-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 {submitting ? (
                   <span className="flex items-center gap-2">
@@ -316,7 +325,7 @@ export default function BookPage() {
 function Detail({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-2.5">
-      <Icon size={14} className="text-emerald-600 shrink-0" />
+      <Icon size={14} className="text-primary-600 shrink-0" />
       <span className="text-xs text-gray-500">{label}:</span>
       <span className="text-xs font-semibold text-gray-800">{value}</span>
     </div>

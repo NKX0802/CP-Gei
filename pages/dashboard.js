@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
   Plus, Calendar, AlertTriangle, X, Loader2,
-  Clock, CheckCircle2, XCircle, QrCode, Eye,
+  Clock, CheckCircle2, XCircle, QrCode, Eye, Star,
 } from 'lucide-react'
 import BookingCard from '@/components/BookingCard'
 import StatusBadge from '@/components/StatusBadge'
+import { Skeleton, SkeletonStat, SkeletonCard } from '@/components/Skeleton'
 import toast from 'react-hot-toast'
 
 const TABS = [
@@ -194,14 +195,35 @@ export default function DashboardPage() {
 
   // ── Computed values ────────────────────────────────────────────────────────
   const upcomingCount = bookings.filter(b => b.booking_status === 'booked').length
+  const checkedInCount = bookings.filter(b => b.booking_status === 'checked-in').length
+  const cancelledCount = bookings.filter(b => b.booking_status === 'no-show' || b.booking_status === 'cancelled').length
   const activeStatuses = TABS.find(t => t.key === activeTab)?.statuses ?? []
   const filtered = bookings.filter(b => activeStatuses.includes(b.booking_status))
+
+  const STAT_CARDS = [
+    { label: 'Upcoming', value: upcomingCount, icon: Calendar, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
+    { label: 'Checked In', value: checkedInCount, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
+    { label: 'Cancelled / No-Show', value: cancelledCount, icon: XCircle, color: 'bg-gray-50 text-gray-500', border: 'border-gray-100' },
+    { label: 'Favourites', value: favCount, icon: Star, color: 'bg-amber-50 text-amber-500', border: 'border-amber-100' },
+  ]
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-emerald-500" />
+      <div className="min-h-screen bg-primary-50 pt-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <Skeleton className="h-24 sm:h-28 rounded-xl mb-6" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-7">
+            {Array.from({ length: 4 }).map((_, i) => <SkeletonStat key={i} />)}
+          </div>
+          <Skeleton className="h-5 w-40 mb-4" />
+          <div className="flex gap-2 mb-5">
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-24 rounded-xl" />)}
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        </div>
       </div>
     )
   }
@@ -209,10 +231,10 @@ export default function DashboardPage() {
   // ── Error / not logged in ──────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-primary-50 pt-16 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 text-sm mb-4">{error}</p>
-          <Link href="/login" className="text-emerald-600 font-semibold hover:underline">
+          <Link href="/login" className="text-primary-600 font-semibold hover:underline">
             Go to Login
           </Link>
         </div>
@@ -222,43 +244,48 @@ export default function DashboardPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-green-50 pt-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <div className="min-h-screen bg-primary-50 pt-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
-        {/* ── Page header ── */}
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1
-              className="text-2xl sm:text-3xl font-extrabold text-gray-900"
-              style={{ fontFamily: 'Nunito, sans-serif' }}
+        {/* ── Page banner ── */}
+        <div className="relative overflow-hidden bg-primary-600 rounded-xl p-6 sm:p-7 mb-6">
+          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-20 h-20 rounded-2xl bg-white/10 rotate-12 pointer-events-none" />
+          <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                Dashboard
+              </h1>
+              {user && (
+                <p className="text-sm text-primary-100 mt-0.5">Welcome back, {user.user_name} 👋</p>
+              )}
+            </div>
+            <Link
+              href="/facilities"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white shrink-0"
             >
-              Dashboard
-            </h1>
-            {user && (
-              <p className="text-sm text-gray-500 mt-0.5">Welcome back, {user.user_name} 👋</p>
-            )}
-            <p className="text-sm text-gray-400 mt-1">
-              {upcomingCount > 0
-                ? `${upcomingCount} upcoming ${upcomingCount === 1 ? 'booking' : 'bookings'}`
-                : 'No upcoming bookings'}
-              {favCount > 0 && ` · ${favCount} saved ${favCount === 1 ? 'favourite' : 'favourites'}`}
-            </p>
+              <Plus size={15} /> Add Booking
+            </Link>
           </div>
-          <Link
-            href="/facilities"
-            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 shrink-0"
-          >
-            <Plus size={15} /> Add Booking
-          </Link>
+        </div>
+
+        {/* ── Stat cards ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-7">
+          {STAT_CARDS.map(({ label, value, icon: Icon, color, border }) => (
+            <div key={label} className={`bg-white rounded-xl border-t-4 ${border} shadow-sm p-4`}>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${color}`}>
+                <Icon size={16} />
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">{value}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+            </div>
+          ))}
         </div>
 
         {/* ── Section title ── */}
         <div className="flex items-center gap-2 mb-4">
-          <Calendar size={16} className="text-emerald-600" />
-          <h2
-            className="text-base font-bold text-gray-800"
-            style={{ fontFamily: 'Nunito, sans-serif' }}
-          >
+          <Calendar size={16} className="text-primary-600" />
+          <h2 className="text-base font-bold text-gray-800">
             My Booking Status
           </h2>
         </div>
@@ -270,14 +297,14 @@ export default function DashboardPage() {
               key={tab.key}
               id={`tab-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${activeTab === tab.key
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-emerald-300 hover:text-emerald-700'
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-400 ${activeTab === tab.key
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-primary-300 dark:hover:border-primary-500 hover:text-primary-700'
                 }`}
             >
               {tab.label}
               {tab.key === 'booked' && upcomingCount > 0 && (
-                <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${activeTab === 'booked' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'
+                <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${activeTab === 'booked' ? 'bg-white/20 text-white' : 'bg-primary-100 text-primary-700'
                   }`}>
                   {upcomingCount}
                 </span>
@@ -310,7 +337,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-gray-400 mb-5">Start by browsing available facilities.</p>
                 <Link
                   href="/facilities"
-                  className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <Plus size={15} /> Browse Facilities
                 </Link>
@@ -338,18 +365,15 @@ export default function DashboardPage() {
           />
 
           {/* Modal card */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 overflow-hidden">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm z-10 overflow-hidden">
 
             {/* Modal header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <Eye size={15} className="text-emerald-600" />
+                <div className="w-8 h-8 rounded-xl bg-primary-100 flex items-center justify-center">
+                  <Eye size={15} className="text-primary-600" />
                 </div>
-                <h3
-                  className="font-bold text-gray-900 text-sm"
-                  style={{ fontFamily: 'Nunito, sans-serif' }}
-                >
+                <h3 className="font-bold text-gray-900 text-sm">
                   Booking Details
                 </h3>
               </div>
@@ -370,10 +394,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Facility name */}
-              <p
-                className="text-center font-bold text-gray-900 text-base mb-4"
-                style={{ fontFamily: 'Nunito, sans-serif' }}
-              >
+              <p className="text-center font-bold text-gray-900 text-base mb-4">
                 {detailBooking.facility_name}
               </p>
 
@@ -388,7 +409,7 @@ export default function DashboardPage() {
                 <DetailRow
                   label="Check-in Window"
                   value={getCheckinWindow(detailBooking.booking_time_slot)}
-                  highlight="text-emerald-700"
+                  highlight="text-primary-700"
                 />
                 {detailBooking.booking_status === 'checked-in' && detailBooking.checked_in_at && (
                   <DetailRow
@@ -417,7 +438,7 @@ export default function DashboardPage() {
                       setQrBooking(detailBooking)
                       setDetailBooking(null)
                     }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <QrCode size={14} /> QR Check-In
                   </button>
@@ -443,16 +464,13 @@ export default function DashboardPage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setCancelConfirmId(null)}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm z-10 p-6">
             <div className="flex items-start gap-4 mb-5">
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
                 <AlertTriangle size={20} className="text-red-500" />
               </div>
               <div>
-                <h3
-                  className="font-bold text-gray-900 text-base"
-                  style={{ fontFamily: 'Nunito, sans-serif' }}
-                >
+                <h3 className="font-bold text-gray-900 text-base">
                   Cancel booking?
                 </h3>
                 {cancelTarget && (
@@ -466,6 +484,7 @@ export default function DashboardPage() {
               </div>
               <button
                 onClick={() => setCancelConfirmId(null)}
+                aria-label="Close"
                 className="ml-auto p-1 rounded-lg hover:bg-gray-100 text-gray-400 shrink-0 transition-colors"
               >
                 <X size={16} />
@@ -515,17 +534,14 @@ export default function DashboardPage() {
           />
 
           {/* Modal card */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 overflow-hidden border border-emerald-50">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm z-10 overflow-hidden">
             {/* Modal header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <QrCode size={15} className="text-emerald-600" />
+                <div className="w-8 h-8 rounded-xl bg-primary-100 flex items-center justify-center">
+                  <QrCode size={15} className="text-primary-600" />
                 </div>
-                <h3
-                  className="font-bold text-gray-900 text-sm"
-                  style={{ fontFamily: 'Nunito, sans-serif' }}
-                >
+                <h3 className="font-bold text-gray-900 text-sm">
                   Booking QR Check-In
                 </h3>
               </div>
@@ -546,9 +562,9 @@ export default function DashboardPage() {
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gray-50/95">
                     {/* Simulated QR skeleton */}
                     <div className="w-40 h-40 border-2 border-dashed border-gray-200 rounded-xl relative overflow-hidden flex items-center justify-center">
-                      <Loader2 className="animate-spin text-emerald-500" size={24} />
+                      <Loader2 className="animate-spin text-primary-500" size={24} />
                       {/* Laser scanning line animation */}
-                      <div className="absolute left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_8px_#10b981] animate-scan-line" />
+                      <div className="absolute left-0 right-0 h-0.5 bg-primary-500 shadow-[0_0_8px_#10b981] animate-scan-line" />
                     </div>
                     <span className="text-[11px] font-semibold text-gray-400 mt-3 animate-pulse">
                       Generating secure pass...
@@ -584,20 +600,17 @@ export default function DashboardPage() {
                     <img
                       src={qrData.qr_data_url}
                       alt="Booking QR Code"
-                      className="w-48 h-48 rounded-xl border border-emerald-100/50 shadow-sm transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="w-48 h-48 rounded-xl border border-primary-100/50 shadow-sm transition-transform duration-300 group-hover:scale-[1.02]"
                     />
                     {/* Tiny visual accent for camera target */}
-                    <div className="absolute -inset-1 border-2 border-emerald-500/20 rounded-2xl pointer-events-none" />
+                    <div className="absolute -inset-1 border-2 border-primary-500/20 rounded-xl pointer-events-none" />
                   </div>
                 )}
               </div>
 
               {/* Booking Context */}
               <div className="mb-5">
-                <p
-                  className="font-bold text-gray-800 text-sm mb-1"
-                  style={{ fontFamily: 'Nunito, sans-serif' }}
-                >
+                <p className="font-bold text-gray-800 text-sm mb-1">
                   {qrBooking.facility_name}
                 </p>
                 <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500 font-medium">
@@ -605,7 +618,7 @@ export default function DashboardPage() {
                   <span>•</span>
                   <span>{qrBooking.booking_time_slot}</span>
                 </div>
-                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[11px] font-semibold">
+                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 text-primary-700 rounded-full text-[11px] font-semibold">
                   <Clock size={11} />
                   <span>Check-in Window: {getCheckinWindow(qrBooking.booking_time_slot)}</span>
                 </div>
@@ -614,8 +627,8 @@ export default function DashboardPage() {
               {/* Instructions */}
               <div className="bg-gray-50 rounded-xl p-3.5 border border-gray-100/50 text-left mb-5">
                 <div className="flex gap-2 items-start">
-                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-[10px] font-bold text-emerald-700">i</span>
+                  <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-[10px] font-bold text-primary-700">i</span>
                   </div>
                   <div>
                     <h4 className="text-[11px] font-bold text-gray-700">How to check in?</h4>

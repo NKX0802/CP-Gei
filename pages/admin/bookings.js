@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Search, X, CheckCircle2, XCircle, Edit2, Loader2, RefreshCw } from 'lucide-react'
+import { Search, X, CheckCircle2, XCircle, Edit2, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
 import StatusBadge from '@/components/StatusBadge'
+import { Skeleton, SkeletonRow } from '@/components/Skeleton'
 
 const STATUS_FILTERS = ['all', 'booked', 'checked-in', 'no-show', 'cancelled']
 const EDITABLE_STATUSES = ['booked', 'no-show']
@@ -134,7 +135,7 @@ export default function AdminBookingsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by user or facility…"
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900 placeholder-gray-300 bg-white"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900 placeholder-gray-300 bg-white"
           />
         </div>
         <div className="flex gap-1.5 flex-wrap items-center">
@@ -142,8 +143,8 @@ export default function AdminBookingsPage() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold capitalize transition-all duration-150 will-change-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
-                statusFilter === s ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:border-emerald-300'
+              className={`px-3 py-2 rounded-xl text-xs font-semibold capitalize transition-all duration-150 will-change-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-400 ${
+                statusFilter === s ? 'bg-primary-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:border-primary-300 dark:hover:border-primary-500'
               }`}
             >
               {s === 'all' ? 'All' : s}
@@ -152,7 +153,8 @@ export default function AdminBookingsPage() {
           <button
             onClick={fetchBookings}
             title="Refresh"
-            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-emerald-600 hover:border-emerald-300 transition-all"
+            aria-label="Refresh bookings"
+            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 dark:hover:border-primary-500 transition-all"
           >
             <RefreshCw size={14} />
           </button>
@@ -160,15 +162,84 @@ export default function AdminBookingsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 size={26} className="animate-spin text-emerald-500" />
-        </div>
+        <>
+          <Skeleton className="h-3 w-40 mb-3" />
+          <div className="sm:hidden space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ))}
+          </div>
+          <div className="hidden sm:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-gray-100">
+                {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} cols={6} />)}
+              </tbody>
+            </table>
+          </div>
+        </>
       ) : (
         <>
           <p className="text-xs text-gray-400 mb-3">{bookings.length} booking{bookings.length !== 1 ? 's' : ''} found</p>
 
-          {/* Table */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Mobile: stacked cards */}
+          <div className="sm:hidden space-y-3">
+            {bookings.map(b => {
+              const status = (b.booking_status || '').trim().toLowerCase()
+              const editable = EDITABLE_STATUSES.includes(status)
+              return (
+                <div key={b.booking_id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold shrink-0">
+                        {b.user_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-800 text-sm truncate">{b.user_name}</p>
+                        <p className="text-[11px] text-gray-400 truncate">{b.user_email}</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={b.booking_status} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3">
+                    <p><span className="text-gray-400">Facility:</span> {b.facility_name}</p>
+                    <p><span className="text-gray-400">Group:</span> {b.booking_group_size}</p>
+                    <p><span className="text-gray-400">Date:</span> {b.booking_date}</p>
+                    <p><span className="text-gray-400">Time:</span> {b.booking_time_slot}</p>
+                  </div>
+                  {editable && (
+                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                      <button
+                        onClick={() => openEdit(b)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors"
+                      >
+                        <Edit2 size={13} /> Edit
+                      </button>
+                      {status !== 'cancelled' && (
+                        <button
+                          onClick={() => setCancelModal(b)}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                        >
+                          <XCircle size={13} /> Cancel
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            {bookings.length === 0 && (
+              <div className="py-14 text-center bg-white rounded-xl border border-gray-100">
+                <CheckCircle2 size={28} className="text-gray-200 mx-auto mb-2" />
+                <p className="text-gray-400 text-sm">No bookings match your filters.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -183,7 +254,7 @@ export default function AdminBookingsPage() {
                     <tr key={b.booking_id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold shrink-0">
                             {b.user_name.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -211,7 +282,8 @@ export default function AdminBookingsPage() {
                               <button
                                 onClick={() => openEdit(b)}
                                 title="Edit booking status"
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                aria-label="Edit booking status"
+                                className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 active:bg-primary-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-primary-400"
                               >
                                 <Edit2 size={15} />
                               </button>
@@ -220,6 +292,7 @@ export default function AdminBookingsPage() {
                                 <button
                                   onClick={() => setCancelModal(b)}
                                   title="Cancel booking"
+                                  aria-label="Cancel booking"
                                   className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 active:bg-red-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-red-400"
                                 >
                                   <XCircle size={15} />
@@ -248,10 +321,10 @@ export default function AdminBookingsPage() {
       {editModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeEdit} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm p-6 z-10">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>Edit Booking</h3>
-              <button onClick={closeEdit} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
+              <h3 className="font-bold text-gray-900">Edit Booking</h3>
+              <button onClick={closeEdit} aria-label="Close" className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
                 <X size={18} />
               </button>
             </div>
@@ -266,7 +339,7 @@ export default function AdminBookingsPage() {
               <select
                 value={editStatus}
                 onChange={e => setEditStatus(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900"
+                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900"
               >
                 {STATUS_OPTIONS.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -282,7 +355,7 @@ export default function AdminBookingsPage() {
                   onChange={e => setEditReason(e.target.value)}
                   rows={3}
                   placeholder="e.g. Facility maintenance scheduled"
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
                 />
               </div>
             )}
@@ -291,7 +364,7 @@ export default function AdminBookingsPage() {
               <button
                 onClick={confirmEdit}
                 disabled={submitting}
-                className="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex-1 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {submitting ? 'Saving…' : 'Save Changes'}
               </button>
@@ -310,10 +383,10 @@ export default function AdminBookingsPage() {
       {cancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setCancelModal(null); setCancelReason('') }} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm p-6 z-10">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>Cancel Booking</h3>
-              <button onClick={() => { setCancelModal(null); setCancelReason('') }} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
+              <h3 className="font-bold text-gray-900">Cancel Booking</h3>
+              <button onClick={() => { setCancelModal(null); setCancelReason('') }} aria-label="Close" className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
                 <X size={18} />
               </button>
             </div>
@@ -327,7 +400,7 @@ export default function AdminBookingsPage() {
                 onChange={e => setCancelReason(e.target.value)}
                 rows={3}
                 placeholder="e.g. Facility maintenance scheduled"
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
+                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-red-300 dark:hover:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
               />
             </div>
             <div className="flex gap-3">

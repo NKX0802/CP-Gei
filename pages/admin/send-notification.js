@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
+import { Skeleton } from '@/components/Skeleton'
 
 const TYPE_OPTIONS = [
   { value: 'general', label: 'General' },
@@ -181,7 +182,7 @@ export default function SendNotificationPage() {
                     type="button"
                     onClick={() => handleSendToChange('all')}
                     className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
-                      sendTo === 'all' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                      sendTo === 'all' ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     <Users size={15} /> All Users
@@ -190,7 +191,7 @@ export default function SendNotificationPage() {
                     type="button"
                     onClick={() => handleSendToChange('single')}
                     className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
-                      sendTo === 'single' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                      sendTo === 'single' ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     <User size={15} /> Specific User
@@ -208,7 +209,7 @@ export default function SendNotificationPage() {
                     value={userId}
                     onChange={e => setUserId(e.target.value)}
                     disabled={usersLoading}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900 disabled:opacity-60"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900 disabled:opacity-60"
                   >
                     <option value="">{usersLoading ? 'Loading users…' : 'Select a user'}</option>
                     {users.map(u => (
@@ -228,7 +229,7 @@ export default function SendNotificationPage() {
                   <select
                     value={notificationType}
                     onChange={e => setNotificationType(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900"
                   >
                     {TYPE_OPTIONS.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -248,7 +249,7 @@ export default function SendNotificationPage() {
                   onChange={e => setTitle(e.target.value)}
                   placeholder="e.g. Facility Closure"
                   maxLength={150}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900 placeholder-gray-300"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900 placeholder-gray-300"
                 />
               </div>
 
@@ -262,14 +263,14 @@ export default function SendNotificationPage() {
                   onChange={e => setMessage(e.target.value)}
                   rows={4}
                   placeholder="Type your notification message here…"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition resize-none text-gray-900 placeholder-gray-300"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 shadow-md shadow-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 {sending ? (
                   <span className="flex items-center gap-2">
@@ -291,13 +292,22 @@ export default function SendNotificationPage() {
         <div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-gray-800" style={{ fontFamily: 'Nunito, sans-serif' }}>Sent Notifications</h2>
+              <h2 className="font-bold text-gray-800">Sent Notifications</h2>
               {!sentLoading && <span className="text-xs text-gray-400">{sent.length} sent</span>}
             </div>
 
             {sentLoading ? (
-              <div className="py-16 flex items-center justify-center">
-                <Loader2 size={22} className="animate-spin text-emerald-400" />
+              <div className="divide-y divide-gray-50">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-start gap-3 px-5 py-4">
+                    <Skeleton className="w-8 h-8 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3 w-1/3" />
+                      <Skeleton className="h-3.5 w-2/3" />
+                      <Skeleton className="h-3 w-full" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="divide-y divide-gray-50 max-h-130 overflow-y-auto">
@@ -328,6 +338,7 @@ export default function SendNotificationPage() {
                         onClick={() => handleDelete(n)}
                         disabled={deletingKey === key}
                         title="Delete this notification"
+                        aria-label="Delete this notification"
                         className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 active:scale-90 disabled:opacity-50 transition-all duration-150"
                       >
                         {deletingKey === key ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}

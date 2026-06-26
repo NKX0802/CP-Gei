@@ -134,8 +134,8 @@ export default function AdminQRScanPage() {
           {/* 1. Normal/Ready state (Not scanning, No results) */}
           {!scanning && !verifying && !scanResult && (
             <>
-              <div className="mx-auto w-52 h-52 mb-5 border-2 border-dashed border-emerald-200 rounded-2xl bg-gray-50 flex flex-col items-center justify-center gap-2">
-                <QrCode size={48} className="text-emerald-500/70" />
+              <div className="mx-auto w-52 h-52 mb-5 border-2 border-dashed border-primary-200 rounded-xl bg-gray-50 flex flex-col items-center justify-center gap-2">
+                <QrCode size={48} className="text-primary-500/70" />
                 <p className="text-xs text-gray-400 font-medium">Ready to scan</p>
               </div>
 
@@ -152,7 +152,7 @@ export default function AdminQRScanPage() {
 
               <button
                 onClick={startScanner}
-                className="flex items-center justify-center gap-2 mx-auto px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                className="flex items-center justify-center gap-2 mx-auto px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 <Camera size={17} /> Start Camera Scanner
               </button>
@@ -180,7 +180,7 @@ export default function AdminQRScanPage() {
           {/* 3. Verifying (loading) state */}
           {verifying && (
             <div className="py-12">
-              <Loader2 size={36} className="animate-spin text-emerald-500 mx-auto mb-4" />
+              <Loader2 size={36} className="animate-spin text-primary-500 mx-auto mb-4" />
               <p className="text-sm font-semibold text-gray-700">Verifying check-in…</p>
               <p className="text-xs text-gray-400 mt-1">Please wait while we check the bookings</p>
             </div>
@@ -195,7 +195,7 @@ export default function AdminQRScanPage() {
                   <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
                     <CheckCircle2 size={32} className="text-emerald-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-emerald-700 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                  <h2 className="text-xl font-bold text-emerald-700 mb-2">
                     Check-in Successful!
                   </h2>
                   <p className="text-sm text-gray-600 mb-6 px-4">
@@ -210,7 +210,7 @@ export default function AdminQRScanPage() {
                       <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
                         <Clock size={32} className="text-amber-600" />
                       </div>
-                      <h2 className="text-xl font-bold text-amber-700 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                      <h2 className="text-xl font-bold text-amber-700 mb-2">
                         Too Early
                       </h2>
                     </>
@@ -219,7 +219,7 @@ export default function AdminQRScanPage() {
                       <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
                         <AlertTriangle size={32} className="text-red-500" />
                       </div>
-                      <h2 className="text-xl font-bold text-red-600 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                      <h2 className="text-xl font-bold text-red-600 mb-2">
                         Check-in Expired
                       </h2>
                     </>
@@ -228,7 +228,7 @@ export default function AdminQRScanPage() {
                       <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
                         <XCircle size={32} className="text-red-500" />
                       </div>
-                      <h2 className="text-xl font-bold text-red-600 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                      <h2 className="text-xl font-bold text-red-600 mb-2">
                         Check-in Failed
                       </h2>
                     </>
@@ -241,7 +241,7 @@ export default function AdminQRScanPage() {
 
               <button
                 onClick={reset}
-                className="flex items-center justify-center gap-2 mx-auto px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="flex items-center justify-center gap-2 mx-auto px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-primary-50 hover:text-primary-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400"
               >
                 <RefreshCw size={15} /> Scan Again
               </button>

@@ -3,10 +3,24 @@
 /* Tell Tailwind v4 what "dark:" means */
 @variant dark (&:where(.dark, .dark *));
 
+/* ── Brand palette (green) — generates bg-primary-*, text-primary-*, etc. ── */
+@theme {
+  --color-primary-50:  #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+}
+
 /* ── Design tokens ─────────────────────────────────── */
 :root {
   --font-heading: 'Nunito', sans-serif;
-  --font-body:    'Outfit', sans-serif;
+  --font-body:    'Nunito', sans-serif;
 
   --bg-page:   #f0fdf4;
   --bg-card:   #ffffff;
@@ -67,6 +81,7 @@ html.dark .bg-gray-900      { background-color: #020617 !important; }
 
 /* Coloured icon/badge backgrounds — use translucent tints so icons stay visible on dark cards */
 html.dark .bg-emerald-50    { background-color: rgba(16,  185, 129, 0.15) !important; }
+html.dark .bg-primary-50    { background-color: rgba(5,   150, 105, 0.18) !important; }
 html.dark .bg-blue-50       { background-color: rgba(59,  130, 246, 0.15) !important; }
 html.dark .bg-red-50        { background-color: rgba(239,  68,  68, 0.22) !important; }
 html.dark .bg-amber-50      { background-color: rgba(245, 158,  11, 0.15) !important; }
@@ -77,6 +92,7 @@ html.dark .bg-pink-50       { background-color: rgba(236,  72, 153, 0.15) !impor
 
 /* Badge/chip -100 level backgrounds — make status badges and type tags readable on dark cards */
 html.dark .bg-blue-100      { background-color: rgba(59,  130, 246, 0.25) !important; }
+html.dark .bg-primary-100   { background-color: rgba(5,   150, 105, 0.3)  !important; }
 html.dark .bg-emerald-100   { background-color: rgba(16,  185, 129, 0.25) !important; }
 html.dark .bg-red-100       { background-color: rgba(239,  68,  68, 0.25) !important; }
 html.dark .bg-orange-100    { background-color: rgba(249, 115,  22, 0.25) !important; }
@@ -106,6 +122,8 @@ html.dark .hero-headline     { color: #e2e8f0 !important; }
 html.dark .text-blue-700     { color: #93c5fd !important; }
 html.dark .text-blue-800     { color: #bfdbfe !important; }
 html.dark .text-emerald-700  { color: #6ee7b7 !important; }
+html.dark .text-primary-600  { color: #6ee7b7 !important; }
+html.dark .text-primary-700  { color: #a7f3d0 !important; }
 html.dark .text-red-700      { color: #fca5a5 !important; }
 html.dark .text-orange-700   { color: #fdba74 !important; }
 html.dark .text-purple-700   { color: #c4b5fd !important; }
@@ -121,10 +139,10 @@ html.dark .border-gray-300  { border-color: #64748b !important; }
 html.dark .divide-gray-50  > * + * { border-color: #334155 !important; }
 html.dark .divide-gray-100 > * + * { border-color: #475569 !important; }
 
-/* Shadows */
-html.dark .shadow-sm  { box-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; }
-html.dark .shadow-md  { box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important; }
-html.dark .shadow-lg  { box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
+/* Shadows — flat, low-blur (this design avoids heavy/blurred elevation) */
+html.dark .shadow-sm  { box-shadow: 0 1px 0 rgba(0,0,0,0.4) !important; }
+html.dark .shadow-md  { box-shadow: 0 1px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) !important; }
+html.dark .shadow-lg  { box-shadow: 0 2px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) !important; }
 
 /* Inputs */
 html.dark input:not([type="file"]),
@@ -136,6 +154,13 @@ html.dark textarea {
 }
 html.dark input::placeholder,
 html.dark textarea::placeholder { color: #475569 !important; }
+
+/* Native date/time picker icon — browser renders it black regardless of theme */
+html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.5);
+}
 
 /* Table rows */
 html.dark .hover\:bg-gray-50:hover  { background-color: #243650 !important; }

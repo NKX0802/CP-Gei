@@ -92,20 +92,17 @@ export default function Navbar() {
     return (
       <Link
         href={href}
-        className={`relative flex items-center gap-1.5 text-sm font-medium px-1 py-0.5 transition-colors duration-200 group
-          ${active ? "text-emerald-600" : "text-gray-600 hover:text-emerald-600"}`}
+        title={label}
+        className={`relative flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-lg transition-colors duration-150
+          ${active ? "bg-white text-primary-700 shadow-sm" : "text-gray-500 hover:text-primary-600"}`}
       >
         <Icon size={15} className="shrink-0" />
-        {label}
+        <span className="hidden lg:inline">{label}</span>
         {badge > 0 && (
           <span className="flex items-center justify-center min-w-4.5 h-4.5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
             {badge > 9 ? "9+" : badge}
           </span>
         )}
-        <span
-          className={`absolute -bottom-1 left-0 h-0.5 bg-emerald-600 rounded-full transition-all duration-300
-          ${active ? "w-full" : "w-0 group-hover:w-full"}`}
-        />
       </Link>
     );
   }
@@ -125,19 +122,16 @@ export default function Navbar() {
               href="/dashboard"
               className="flex items-center gap-2 group shrink-0"
             >
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm group-hover:bg-emerald-700 transition-colors duration-200">
+              <div className="w-8 h-8 rounded-xl bg-primary-600 flex items-center justify-center shadow-sm group-hover:bg-primary-700 transition-colors duration-200">
                 <Building2 size={16} className="text-white" />
               </div>
-              <span
-                className="text-base font-bold text-gray-900 tracking-tight"
-                style={{ fontFamily: "Nunito, sans-serif" }}
-              >
-                Campus<span className="text-emerald-600">Book</span>
+              <span className="text-base font-bold text-gray-900 tracking-tight">
+                Flexi<span className="text-primary-600">Book</span>
               </span>
             </Link>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-1 bg-gray-50 rounded-xl p-1">
               {STUDENT_LINKS.map((link) => (
                 <NavLink
                   key={link.href}
@@ -148,12 +142,13 @@ export default function Navbar() {
             </div>
 
             {/* Right: theme toggle + role switcher + user chip */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 pl-3 ml-1 border-l border-gray-100">
               {/* Dark / Light toggle */}
               <button
                 onClick={toggleTheme}
                 title={dark ? "Switch to light mode" : "Switch to dark mode"}
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/40 dark:hover:text-primary-400 active:bg-primary-100 dark:active:bg-primary-900/60 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400"
               >
                 {dark ? <Sun size={17} /> : <Moon size={17} />}
               </button>
@@ -161,17 +156,17 @@ export default function Navbar() {
               {/* User chip */}
               <Link
                 href="/profile"
-                className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 group"
+                className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-primary-50 hover:bg-primary-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 group"
               >
-                <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                   {currentUser.user_name.charAt(0)}
                 </div>
-                <span className="text-xs font-semibold text-gray-700 group-hover:text-emerald-700 transition-colors max-w-24 truncate">
+                <span className="text-xs font-semibold text-gray-700 group-hover:text-primary-700 transition-colors max-w-24 truncate">
                   {currentUser.user_name.split(" ")[0]}
                 </span>
                 <User
                   size={12}
-                  className="text-gray-400 group-hover:text-emerald-600 transition-colors"
+                  className="text-gray-400 group-hover:text-primary-600 transition-colors"
                 />
               </Link>
 
@@ -190,12 +185,13 @@ export default function Navbar() {
             <div className="md:hidden flex items-center gap-1">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl text-gray-500 hover:bg-emerald-50 hover:text-emerald-700 active:bg-emerald-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+                className="p-2 rounded-xl text-gray-500 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-900/40 dark:hover:text-primary-400 active:bg-primary-100 dark:active:bg-primary-900/60 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-400"
               >
                 {dark ? <Sun size={19} /> : <Moon size={19} />}
               </button>
               <button
-                className="p-2 rounded-xl text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 active:bg-emerald-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="p-2 rounded-xl text-gray-600 hover:bg-primary-50 hover:text-primary-700 active:bg-primary-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-400"
                 onClick={() => setMobileOpen((o) => !o)}
                 aria-label="Toggle menu"
               >
@@ -219,8 +215,8 @@ export default function Navbar() {
                   href={href}
                   className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
                     active
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-gray-700 hover:bg-gray-50 active:bg-emerald-50 active:text-emerald-700"
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-gray-700 hover:bg-gray-50 active:bg-primary-50 active:text-primary-700"
                   }`}
                 >
                   <Icon size={18} />
@@ -237,9 +233,9 @@ export default function Navbar() {
             {/* Mobile profile */}
             <Link
               href="/profile"
-              className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-emerald-50 transition-all duration-150"
+              className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-primary-50 transition-all duration-150"
             >
-              <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold">
                 {currentUser.user_name.charAt(0)}
               </div>
               <div>
@@ -270,22 +266,20 @@ export default function Navbar() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowLogoutConfirm(false)}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm z-10 p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
                 <LogOut size={18} className="text-red-500" />
               </div>
               <button
                 onClick={() => setShowLogoutConfirm(false)}
+                aria-label="Close"
                 className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
-            <h3
-              className="font-bold text-gray-900 text-base mb-1"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
+            <h3 className="font-bold text-gray-900 text-base mb-1">
               Log out?
             </h3>
             <p className="text-sm text-gray-500 mb-5">

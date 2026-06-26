@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, SlidersHorizontal, Building2, ChevronDown, Check, Loader2 } from 'lucide-react'
+import { Search, SlidersHorizontal, Building2, ChevronDown, Check } from 'lucide-react'
 import FacilityCard from '@/components/FacilityCard'
+import { SkeletonFacilityCard } from '@/components/Skeleton'
 import toast from 'react-hot-toast'
 
 const TYPE_OPTIONS = [
@@ -34,7 +35,7 @@ function CustomSelect({ value, onChange, options, minWidth = 'min-w-40' }) {
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-emerald-400 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-primary-400 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${selected.dot}`} />
         <span className="flex-1 text-left truncate">{selected.label}</span>
@@ -55,13 +56,13 @@ function CustomSelect({ value, onChange, options, minWidth = 'min-w-40' }) {
                 onClick={() => { onChange(opt.value); setOpen(false) }}
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm transition-all duration-100 ${
                   isActive
-                    ? 'bg-emerald-50 text-emerald-700'
+                    ? 'bg-primary-50 text-primary-700'
                     : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full shrink-0 ${opt.dot}`} />
                 <span className="font-medium flex-1 text-left">{opt.label}</span>
-                {isActive && <Check size={14} className="text-emerald-600 shrink-0" />}
+                {isActive && <Check size={14} className="text-primary-600 shrink-0" />}
               </button>
             )
           })}
@@ -151,12 +152,12 @@ export default function FacilitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 pt-16">
+    <div className="min-h-screen bg-primary-50 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
 
         {/* Header */}
         <div className="mb-7">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             Facilities
           </h1>
           <p className="text-sm text-gray-500 mt-1">Browse and book campus rooms, courts, and equipment</p>
@@ -171,7 +172,7 @@ export default function FacilitiesPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search facilities…"
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900 placeholder-gray-300"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm hover:border-primary-300 dark:hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900 placeholder-gray-300"
             />
           </div>
 
@@ -195,15 +196,15 @@ export default function FacilitiesPage() {
 
         {/* Loading */}
         {loading ? (
-          <div className="flex justify-center py-24">
-            <Loader2 size={28} className="animate-spin text-emerald-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonFacilityCard key={i} />)}
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <p className="text-sm text-red-400 mb-3">{error}</p>
             <button
               onClick={() => { setSearch(''); setTypeFilter('all'); setStatusFilter('all') }}
-              className="px-4 py-2 text-sm font-semibold text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-all"
+              className="px-4 py-2 text-sm font-semibold text-primary-600 bg-primary-50 rounded-xl hover:bg-primary-100 transition-all"
             >
               Try again
             </button>
@@ -236,7 +237,7 @@ export default function FacilitiesPage() {
                 <p className="text-sm text-gray-400">Try adjusting your search or filters</p>
                 <button
                   onClick={() => { setSearch(''); setTypeFilter('all'); setStatusFilter('all') }}
-                  className="mt-4 px-4 py-2 text-sm font-semibold text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 active:bg-emerald-200 transition-all will-change-transform hover:scale-105 active:scale-95"
+                  className="mt-4 px-4 py-2 text-sm font-semibold text-primary-600 bg-primary-50 rounded-xl hover:bg-primary-100 active:bg-primary-200 transition-all will-change-transform hover:scale-105 active:scale-95"
                 >
                   Clear filters
                 </button>

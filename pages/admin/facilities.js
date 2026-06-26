@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, X, Building2, Users, Tag, CheckCircle2, ImagePlus,
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
 import StatusBadge from '@/components/StatusBadge'
+import { Skeleton, SkeletonRow } from '@/components/Skeleton'
 
 const BLANK = { facility_name: '', facility_capacity: '', facility_type: 'room', facility_status: 'open', facility_description: '', facility_image_url: '' }
 
@@ -157,24 +158,92 @@ export default function AdminFacilitiesPage() {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <p className="text-sm text-gray-500">{facilities.length} facilities total</p>
-          <button onClick={fetchFacilities} title="Refresh" className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all">
+          <button onClick={fetchFacilities} title="Refresh" aria-label="Refresh facilities" className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all">
             <RefreshCw size={14} />
           </button>
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-md shadow-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           <Plus size={16} /> Add Facility
         </button>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 size={26} className="animate-spin text-emerald-500" />
-        </div>
+        <>
+          <div className="sm:hidden space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ))}
+          </div>
+          <div className="hidden sm:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-gray-100">
+                {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} cols={5} />)}
+              </tbody>
+            </table>
+          </div>
+        </>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <>
+          {/* Mobile: stacked cards */}
+          <div className="sm:hidden space-y-3">
+            {facilities.map(f => (
+              <div key={f.facility_id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {f.facility_image_url ? (
+                      <img src={f.facility_image_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+                        <Building2 size={18} className="text-primary-600" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm truncate">{f.facility_name}</p>
+                      <p className="text-xs text-gray-400 line-clamp-1">{f.facility_description}</p>
+                    </div>
+                  </div>
+                  <StatusBadge status={f.facility_status} />
+                </div>
+                <div className="flex items-center gap-3 text-xs text-gray-600 mb-3">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-semibold capitalize bg-gray-100 text-gray-600">
+                    <Tag size={10} /> {f.facility_type}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users size={13} className="text-gray-400" /> {f.facility_capacity}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => openEdit(f)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors"
+                  >
+                    <Edit2 size={13} /> Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(f)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                  >
+                    <Trash2 size={13} /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+            {facilities.length === 0 && (
+              <div className="py-16 text-center bg-white rounded-xl border border-gray-100">
+                <Building2 size={28} className="text-gray-200 mx-auto mb-2" />
+                <p className="text-gray-400 text-sm">No facilities yet. Add one above.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -192,8 +261,8 @@ export default function AdminFacilitiesPage() {
                         {f.facility_image_url ? (
                           <img src={f.facility_image_url} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                            <Building2 size={16} className="text-emerald-600" />
+                          <div className="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+                            <Building2 size={16} className="text-primary-600" />
                           </div>
                         )}
                         <div>
@@ -217,8 +286,9 @@ export default function AdminFacilitiesPage() {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => openEdit(f)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 active:bg-primary-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-primary-400"
                           title="Edit"
+                          aria-label="Edit facility"
                         >
                           <Edit2 size={15} />
                         </button>
@@ -226,6 +296,7 @@ export default function AdminFacilitiesPage() {
                           onClick={() => setDeleteConfirm(f)}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 active:bg-red-100 transition-all will-change-transform hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-red-400"
                           title="Delete"
+                          aria-label="Delete facility"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -242,21 +313,22 @@ export default function AdminFacilitiesPage() {
               <p className="text-gray-400 text-sm">No facilities yet. Add one above.</p>
             </div>
           )}
-        </div>
+          </div>
+        </>
       )}
 
       {/* Add/Edit Modal */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 flex flex-col"
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-md z-10 flex flex-col"
             style={{ maxHeight: 'min(90vh, 680px)' }}>
 
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
-              <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>
+              <h2 className="font-bold text-gray-900 text-lg">
                 {modal === 'add' ? 'Add Facility' : 'Edit Facility'}
               </h2>
-              <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
+              <button onClick={closeModal} aria-label="Close" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
                 <X size={18} />
               </button>
             </div>
@@ -297,7 +369,7 @@ export default function AdminFacilitiesPage() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full h-32 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 cursor-pointer"
+                      className="w-full h-32 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-200 cursor-pointer"
                     >
                       <ImagePlus size={26} />
                       <div className="text-center">
@@ -351,7 +423,7 @@ export default function AdminFacilitiesPage() {
 
             <div className="flex gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
               <button onClick={handleSave} disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-60 disabled:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500">
                 {saving ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle2 size={15} />}
                 {saving ? 'Saving…' : modal === 'add' ? 'Add Facility' : 'Save Changes'}
               </button>
@@ -368,11 +440,11 @@ export default function AdminFacilitiesPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10 text-center">
+          <div className="relative bg-white rounded-xl border border-gray-200 shadow-md w-full max-w-sm p-6 z-10 text-center">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
               <Trash2 size={22} className="text-red-500" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-1" style={{ fontFamily: 'Nunito, sans-serif' }}>Delete facility?</h3>
+            <h3 className="font-bold text-gray-900 mb-1">Delete facility?</h3>
             <p className="text-sm text-gray-500 mb-1">
               <strong>{deleteConfirm.facility_name}</strong>
             </p>
@@ -403,7 +475,6 @@ export default function AdminFacilitiesPage() {
           outline: 2px solid transparent;
           outline-offset: 2px;
           transition: border-color 0.15s, outline-color 0.15s;
-          font-family: Outfit, sans-serif;
         }
         .input-base:focus {
           border-color: #059669;

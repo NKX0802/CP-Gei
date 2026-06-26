@@ -2,15 +2,20 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Calendar, CheckCircle2, AlertCircle, XCircle,
-  Building2, Users, TrendingUp, ArrowRight, Loader2,
+  Building2, Users, TrendingUp, ArrowRight,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import AdminLayout from '@/components/AdminLayout'
 import StatusBadge from '@/components/StatusBadge'
+import { Skeleton, SkeletonStat } from '@/components/Skeleton'
+import { useRole } from '@/lib/roleContext'
+import { useTheme } from '@/lib/themeContext'
 
 export default function AdminDashboardPage() {
+  const { user } = useRole()
+  const { dark } = useTheme()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -36,10 +41,13 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <AdminLayout title="Dashboard">
-        <div className="flex items-center justify-center py-32">
-          <Loader2 size={28} className="animate-spin text-emerald-500" />
+      <AdminLayout>
+        <Skeleton className="h-24 sm:h-28 rounded-xl mb-6" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonStat key={i} />)}
         </div>
+        <Skeleton className="h-64 rounded-xl mb-5" />
+        <Skeleton className="h-48 rounded-xl" />
       </AdminLayout>
     )
   }
@@ -102,16 +110,28 @@ export default function AdminDashboardPage() {
   ]
 
   return (
-    <AdminLayout title="Dashboard">
+    <AdminLayout>
+
+      {/* Banner */}
+      <div className="relative overflow-hidden bg-primary-600 rounded-xl p-6 sm:p-7 mb-6">
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-20 h-20 rounded-2xl bg-white/10 rotate-12 pointer-events-none" />
+        <div className="relative">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Dashboard</h1>
+          <p className="text-sm text-primary-100 mt-0.5">
+            {user ? `Welcome back, ${user.user_name} 👋` : 'Campus operations overview'}
+          </p>
+        </div>
+      </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {STAT_CARDS.map(({ label, value, icon: Icon, color, border }) => (
-          <div key={label} className={`bg-white rounded-2xl border ${border} shadow-sm p-4`}>
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color}`}>
+          <div key={label} className={`bg-white rounded-xl border-t-4 ${border} shadow-sm p-4`}>
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${color}`}>
               <Icon size={17} />
             </div>
-            <p className="text-2xl font-extrabold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{value}</p>
+            <p className="text-2xl font-extrabold text-gray-900">{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}
@@ -120,19 +140,27 @@ export default function AdminDashboardPage() {
       {/* Bar chart */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-gray-800" style={{ fontFamily: 'Nunito, sans-serif' }}>Monthly Bookings</h2>
-          <span className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+          <h2 className="font-bold text-gray-800">Monthly Bookings</h2>
+          <span className="flex items-center gap-1 text-xs text-primary-600 font-semibold">
             <TrendingUp size={13} /> {new Date().getFullYear()}
           </span>
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={monthly} barSize={16} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0fdf4" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#ecfdf5'} vertical={false} />
             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} allowDecimals={false} />
             <Tooltip
-              contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', fontSize: 12, fontFamily: 'Outfit, sans-serif' }}
-              cursor={{ fill: '#f0fdf4' }}
+              contentStyle={{
+                borderRadius: 8,
+                border: `1px solid ${dark ? '#334155' : '#e5e7eb'}`,
+                boxShadow: '0 1px 0 rgba(0,0,0,0.06)',
+                fontSize: 12,
+                backgroundColor: dark ? '#1e293b' : '#ffffff',
+                color: dark ? '#f1f5f9' : '#111827',
+              }}
+              labelStyle={{ color: dark ? '#94a3b8' : '#6b7280' }}
+              cursor={{ fill: dark ? '#334155' : '#ecfdf5' }}
             />
             <Bar dataKey="bookings" fill="#059669" radius={[6, 6, 0, 0]} name="Bookings" />
             <Bar dataKey="checkins" fill="#6ee7b7" radius={[6, 6, 0, 0]} name="Check-ins" />
@@ -144,8 +172,8 @@ export default function AdminDashboardPage() {
       {/* Recent bookings */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h2 className="font-bold text-gray-800" style={{ fontFamily: 'Nunito, sans-serif' }}>Recent Bookings</h2>
-          <Link href="/admin/bookings" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 hover:underline">
+          <h2 className="font-bold text-gray-800">Recent Bookings</h2>
+          <Link href="/admin/bookings" className="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1 hover:underline">
             View all <ArrowRight size={13} />
           </Link>
         </div>
@@ -155,7 +183,7 @@ export default function AdminDashboardPage() {
           ) : (
             recent.map(b => (
               <div key={b.booking_id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold shrink-0">
                   {(b.user_name || '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">

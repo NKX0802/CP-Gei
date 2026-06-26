@@ -1,6 +1,10 @@
 // API: POST /api/upload — receive a base64-encoded image, save to public/images/facilities/
 // Returns: { success: true, url: '/images/facilities/filename.jpg' }
 // Admin only
+//
+// TODO before deploying to Vercel: this writes to the local filesystem, which is
+// read-only on Vercel's serverless functions and will fail in production.
+// Switch back to the @vercel/blob version (using put()) once a Blob store is set up.
 
 import fs from 'fs'
 import path from 'path'
@@ -40,7 +44,6 @@ export default async function handler(req, res) {
   }
 
   // Build a safe, unique filename
-  const ext = path.extname(filename).toLowerCase() || '.jpg'
   const safeName = `${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`
   const dir = path.join(process.cwd(), 'public', 'images', 'facilities')
 

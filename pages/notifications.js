@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   Bell, BellOff, Megaphone, Calendar, QrCode,
-  AlertTriangle, XCircle, CheckCheck, Loader2,
+  AlertTriangle, XCircle, CheckCheck,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Skeleton } from '@/components/Skeleton'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -113,8 +114,22 @@ export default function NotificationsPage() {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-emerald-500" />
+      <div className="min-h-screen bg-primary-50 pt-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <Skeleton className="h-8 w-40 mb-5" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5 flex items-start gap-3">
+                <Skeleton className="w-9 h-9 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-3.5 w-1/3" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -122,25 +137,25 @@ export default function NotificationsPage() {
   // ── Error / not logged in ───────────────────────────────────────────────
   if (error) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-primary-50 pt-16 flex items-center justify-center">
         <p className="text-gray-400 text-sm">{error}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-green-50 pt-16">
+    <div className="min-h-screen bg-primary-50 pt-16">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
         <div className="flex items-start justify-between gap-3 mb-5">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             Notifications
           </h1>
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
               disabled={markingAll}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 active:scale-95 disabled:opacity-60 transition-all duration-150 shrink-0"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-700 dark:hover:text-primary-400 hover:border-primary-200 dark:hover:border-primary-700 active:scale-95 disabled:opacity-60 transition-all duration-150 shrink-0"
             >
               <CheckCheck size={14} />
               {markingAll ? 'Marking…' : 'Mark All as Read'}
@@ -155,12 +170,12 @@ export default function NotificationsPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
-                filter === f.key ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-500 hover:text-emerald-700'
+                filter === f.key ? 'bg-primary-600 text-white shadow-sm' : 'text-gray-500 hover:text-primary-700'
               }`}
             >
               {f.label}
               {f.key === 'unread' && unreadCount > 0 && (
-                <span className={`ml-1.5 ${filter === f.key ? 'text-emerald-100' : 'text-emerald-500'}`}>
+                <span className={`ml-1.5 ${filter === f.key ? 'text-primary-100' : 'text-primary-500'}`}>
                   ({unreadCount})
                 </span>
               )}
@@ -177,8 +192,8 @@ export default function NotificationsPage() {
               return (
                 <div
                   key={n.notification_id}
-                  className={`bg-white rounded-2xl border shadow-sm p-4 sm:p-5 transition-colors ${
-                    unread ? 'border-emerald-200 bg-emerald-50/30' : 'border-gray-100'
+                  className={`bg-white rounded-xl border shadow-sm p-4 sm:p-5 transition-colors ${
+                    unread ? 'border-primary-200 bg-primary-50/30' : 'border-gray-100'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -187,11 +202,11 @@ export default function NotificationsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                        <p className="font-bold text-gray-900 text-sm">
                           {n.title}
                         </p>
                         {unread && (
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Unread" />
+                          <span className="w-2 h-2 rounded-full bg-primary-500 shrink-0" title="Unread" />
                         )}
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words">{n.message}</p>
@@ -206,7 +221,7 @@ export default function NotificationsPage() {
                       <button
                         onClick={() => handleMarkRead(n.notification_id)}
                         disabled={marking === n.notification_id}
-                        className="shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 active:scale-95 disabled:opacity-60 transition-all duration-150"
+                        className="shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-primary-700 bg-primary-100 hover:bg-primary-200 active:scale-95 disabled:opacity-60 transition-all duration-150"
                       >
                         {marking === n.notification_id ? '…' : 'Mark as read'}
                       </button>

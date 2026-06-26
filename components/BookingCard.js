@@ -1,5 +1,12 @@
-import { XCircle, Eye, QrCode, Clock } from 'lucide-react'
+import { XCircle, Eye, QrCode, Clock, Calendar, CheckCircle2, AlertTriangle } from 'lucide-react'
 import StatusBadge from './StatusBadge'
+
+const ACCENT = {
+  booked: 'border-l-primary-500',
+  'checked-in': 'border-l-emerald-500',
+  'no-show': 'border-l-red-400',
+  cancelled: 'border-l-gray-300',
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -69,10 +76,9 @@ export default function BookingCard({ booking, onCancel, onViewDetails, onQRChec
 
   return (
     <div
-      className={`bg-white rounded-2xl border p-4 sm:p-5 transition-shadow duration-200 hover:shadow-md ${status === 'cancelled' || status === 'no-show'
-          ? 'border-gray-100 opacity-75'
-          : 'border-gray-100'
-        }`}
+      className={`bg-white rounded-xl border border-l-4 p-4 sm:p-5 transition-shadow duration-200 hover:shadow-md ${ACCENT[status] || 'border-l-gray-300'} ${
+        status === 'cancelled' || status === 'no-show' ? 'border-gray-100 opacity-75' : 'border-gray-100'
+      }`}
     >
       {/* ── Top row: facility name + status badge ── */}
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -87,37 +93,35 @@ export default function BookingCard({ booking, onCancel, onViewDetails, onQRChec
         <StatusBadge status={status} />
       </div>
 
-      {/* ── Details grid ── */}
-      <div className="space-y-1 mb-4">
-        <p className="text-xs text-gray-500">
-          <span className="font-medium text-gray-600">Date:</span>{' '}
-          {formatDate(booking.booking_date)}
-        </p>
-        <p className="text-xs text-gray-500">
-          <span className="font-medium text-gray-600">Time:</span>{' '}
-          {booking.booking_time_slot}
-        </p>
-        {checkinWin && isActive && (
-          <p className="text-xs text-gray-500 flex items-center gap-1">
-            <Clock size={11} className="text-emerald-500 shrink-0" />
-            <span className="font-medium text-gray-600">Check-in window:</span>{' '}
-            {checkinWin}
-          </p>
-        )}
-        {status === 'checked-in' && booking.checked_in_at && (
-          <p className="text-xs text-emerald-600 font-medium">
-            ✅ Checked in at {formatDateTime(booking.checked_in_at)}
-          </p>
-        )}
-        {status === 'no-show' && booking.no_show_marked_at && (
-          <p className="text-xs text-red-500 font-medium">
-            ⚠️ No-show marked at {formatDateTime(booking.no_show_marked_at)}
-          </p>
-        )}
-        {status === 'cancelled' && booking.booking_cancel_reason && (
-          <p className="text-xs text-gray-400">{booking.booking_cancel_reason}</p>
-        )}
+      {/* ── Details row ── */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5">
+          <Calendar size={12} className="text-gray-400" /> {formatDate(booking.booking_date)}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Clock size={12} className="text-gray-400" /> {booking.booking_time_slot}
+        </span>
       </div>
+
+      {checkinWin && isActive && (
+        <p className="text-xs text-primary-700 bg-primary-50 rounded-lg px-2.5 py-1.5 inline-flex items-center gap-1.5 mb-3">
+          <Clock size={11} className="text-primary-500 shrink-0" />
+          Check-in window: {checkinWin}
+        </p>
+      )}
+      {status === 'checked-in' && booking.checked_in_at && (
+        <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-2.5 py-1.5 inline-flex items-center gap-1.5 mb-3">
+          <CheckCircle2 size={11} className="shrink-0" /> Checked in at {formatDateTime(booking.checked_in_at)}
+        </p>
+      )}
+      {status === 'no-show' && booking.no_show_marked_at && (
+        <p className="text-xs text-red-600 bg-red-50 rounded-lg px-2.5 py-1.5 inline-flex items-center gap-1.5 mb-3">
+          <AlertTriangle size={11} className="shrink-0" /> No-show marked at {formatDateTime(booking.no_show_marked_at)}
+        </p>
+      )}
+      {status === 'cancelled' && booking.booking_cancel_reason && (
+        <p className="text-xs text-gray-400 mb-3">{booking.booking_cancel_reason}</p>
+      )}
 
       {/* ── Action buttons ── */}
       <div className="flex flex-wrap gap-2">
@@ -125,7 +129,7 @@ export default function BookingCard({ booking, onCancel, onViewDetails, onQRChec
         <button
           id={`view-details-${booking.booking_id}`}
           onClick={() => onViewDetails && onViewDetails(booking)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-emerald-50 hover:text-emerald-700 active:bg-emerald-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-primary-50 hover:text-primary-700 active:bg-primary-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-300"
         >
           <Eye size={13} />
           View Details
@@ -136,7 +140,7 @@ export default function BookingCard({ booking, onCancel, onViewDetails, onQRChec
           <button
             id={`qr-checkin-${booking.booking_id}`}
             onClick={() => onQRCheckin && onQRCheckin(booking)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 active:bg-primary-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-300"
           >
             <QrCode size={13} />
             QR Check-In

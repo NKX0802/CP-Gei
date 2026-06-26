@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AlertCircle, Bell, CheckCircle2, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AdminLayout from '@/components/AdminLayout'
+import { Skeleton, SkeletonStat } from '@/components/Skeleton'
 
 export default function AdminNoshowsPage() {
   const [stats, setStats]   = useState(null)
@@ -70,8 +71,24 @@ export default function AdminNoshowsPage() {
   if (loading) {
     return (
       <AdminLayout title="No-Show Report">
-        <div className="flex items-center justify-center py-32">
-          <Loader2 size={28} className="animate-spin text-emerald-500" />
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+          {Array.from({ length: 3 }).map((_, i) => <SkeletonStat key={i} />)}
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <div className="divide-y divide-gray-50">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 px-5 py-4">
+                <Skeleton className="w-9 h-9 rounded-full shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-3.5 w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </AdminLayout>
     )
@@ -93,8 +110,8 @@ export default function AdminNoshowsPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
         {STAT_CARDS.map(({ label, value, color, border }) => (
-          <div key={label} className={`bg-white rounded-2xl border ${border} shadow-sm p-4`}>
-            <p className={`text-2xl font-extrabold ${color}`} style={{ fontFamily: 'Nunito, sans-serif' }}>{value}</p>
+          <div key={label} className={`bg-white rounded-xl border-t-4 ${border} shadow-sm p-4`}>
+            <p className={`text-2xl font-extrabold ${color}`}>{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}
@@ -103,7 +120,7 @@ export default function AdminNoshowsPage() {
       {/* Report table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-bold text-gray-800" style={{ fontFamily: 'Nunito, sans-serif' }}>Users with No-Shows</h2>
+          <h2 className="font-bold text-gray-800">Users with No-Shows</h2>
           <span className="text-xs text-gray-400">{report.length} user{report.length !== 1 ? 's' : ''}</span>
         </div>
 
@@ -120,21 +137,23 @@ export default function AdminNoshowsPage() {
             {report.map(r => (
               <div key={r.user_id}>
                 <div
-                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() => setExpanded(expanded === r.user_id ? null : r.user_id)}
                 >
-                  {/* Avatar */}
-                  <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-sm font-bold shrink-0">
-                    {r.user_name.charAt(0).toUpperCase()}
-                  </div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Avatar */}
+                    <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-sm font-bold shrink-0">
+                      {r.user_name.charAt(0).toUpperCase()}
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-sm">{r.user_name}</p>
-                    <p className="text-xs text-gray-400">{r.user_email} · Latest: {r.latest}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm truncate">{r.user_name}</p>
+                      <p className="text-xs text-gray-400 truncate">{r.user_email} · Latest: {r.latest}</p>
+                    </div>
                   </div>
 
                   {/* Count badge + warn button */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
                       r.count >= 3 ? 'bg-red-100 text-red-700' : r.count >= 2 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
                     }`}>

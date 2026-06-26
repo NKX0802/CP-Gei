@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import StatusBadge from '@/components/StatusBadge'
+import { Skeleton } from '@/components/Skeleton'
 import { TIME_SLOTS } from '@/lib/fakeData'
 
 function getTodayString() {
@@ -142,8 +143,18 @@ export default function FacilityDetailPage() {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
-        <Loader2 size={28} className="animate-spin text-emerald-500" />
+      <div className="min-h-screen bg-primary-50 pt-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Skeleton className="h-5 w-32 mb-5" />
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <Skeleton className="h-56 sm:h-72 rounded-none" />
+            <div className="p-5 sm:p-7 space-y-3">
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -151,10 +162,10 @@ export default function FacilityDetailPage() {
   // ── Error / not found ────────────────────────────────────────────────────
   if (error || !facility) {
     return (
-      <div className="min-h-screen bg-green-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-primary-50 pt-16 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-4">{error || 'Facility not found.'}</p>
-          <Link href="/facilities" className="text-emerald-600 font-semibold hover:underline">← Back to Facilities</Link>
+          <Link href="/facilities" className="text-primary-600 font-semibold hover:underline">← Back to Facilities</Link>
         </div>
       </div>
     )
@@ -163,13 +174,13 @@ export default function FacilityDetailPage() {
   const typeColor = TYPE_COLORS[facility.facility_type] || 'bg-gray-100 text-gray-700'
 
   return (
-    <div className="min-h-screen bg-green-50 pt-16">
+    <div className="min-h-screen bg-primary-50 pt-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Back */}
         <Link
           href="/facilities"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-emerald-700 transition-colors mb-5 group"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary-700 transition-colors mb-5 group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Facilities
@@ -192,6 +203,7 @@ export default function FacilityDetailPage() {
             <button
               onClick={toggleFav}
               disabled={favLoading}
+              aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
               className={`absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-sm transition-all duration-200 will-change-transform hover:scale-110 active:scale-95 disabled:opacity-70 ${
                 isFav ? 'bg-red-500 text-white shadow-lg' : 'bg-white/80 text-gray-400 hover:text-red-500'
               }`}
@@ -203,7 +215,7 @@ export default function FacilityDetailPage() {
           <div className="p-5 sm:p-7">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">
                   {facility.facility_name}
                 </h1>
                 <div className="flex items-center gap-1.5 mt-1 text-sm text-gray-500">
@@ -222,7 +234,7 @@ export default function FacilityDetailPage() {
             {/* Booking section */}
             {facility.facility_status === 'open' ? (
               <div className="border-t border-gray-100 pt-5">
-                <h2 className="font-bold text-gray-800 mb-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                <h2 className="font-bold text-gray-800 mb-4">
                   Select a date &amp; time slot
                 </h2>
 
@@ -236,7 +248,7 @@ export default function FacilityDetailPage() {
                     value={selectedDate}
                     min={getTodayString()}
                     onChange={e => { setSelectedDate(e.target.value); setSelectedSlot(null) }}
-                    className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition text-gray-900"
+                    className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900"
                   />
                 </div>
 
@@ -244,7 +256,7 @@ export default function FacilityDetailPage() {
                   <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
                     <Clock size={14} />
                     Available time slots
-                    {slotsLoading && <Loader2 size={12} className="animate-spin text-emerald-400 ml-1" />}
+                    {slotsLoading && <Loader2 size={12} className="animate-spin text-primary-400 ml-1" />}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                     {TIME_SLOTS.map(slot => {
@@ -257,12 +269,12 @@ export default function FacilityDetailPage() {
                           disabled={booked || past || slotsLoading}
                           onClick={() => setSelectedSlot(slot)}
                           title={past ? 'This time slot has already passed' : undefined}
-                          className={`py-2.5 px-2 rounded-xl text-xs font-semibold text-center transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400
+                          className={`py-2.5 px-2 rounded-xl text-xs font-semibold text-center transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-400
                             ${booked || past
                               ? 'bg-gray-100 text-gray-300 cursor-not-allowed line-through'
                               : selected
-                              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                              : 'bg-green-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                              ? 'bg-primary-600 text-white hover:bg-primary-700'
+                              : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100'
                             }`}
                         >
                           {slot}
@@ -275,7 +287,7 @@ export default function FacilityDetailPage() {
                 <button
                   onClick={handleBook}
                   disabled={!selectedSlot}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 transition-all duration-200 shadow-md shadow-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 will-change-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 >
                   Continue to Booking <ChevronRight size={16} />
                 </button>
