@@ -33,7 +33,7 @@ Built with Next.js (Pages Router) and a MySQL database hosted on TiDB Cloud, wit
 - ⭐ **Favourites** — Save facilities you book often for quick access
 - 🖥️ **Kiosk check-in** — Each booking gets a unique QR code. Guests scan it at the kiosk (`html5-qrcode`) to check in.
 - 🚫 **No-show tracking** — Bookings that go unattended can be flagged as no-shows
-- 🔔 **In-app notifications** — Users receive notifications (e.g. booking updates, admin announcements) with read/unread status
+- 🔔 **In-app notifications** — Users get notifications (updates and announcements) with a read/unread status.
 - 🖼️ **Facility images** — Admins upload photos of facilities, stored via Vercel Blob
 - 📊 **Admin dashboard** — Approve, reject, or manage bookings, with usage charts powered by Recharts
 - 🔐 **Secure login** — JWT cookie-based authentication with `bcryptjs` password hashing
